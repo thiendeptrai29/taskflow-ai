@@ -1,1 +1,1 @@
-# todo-ai-app
+# task manager AI
