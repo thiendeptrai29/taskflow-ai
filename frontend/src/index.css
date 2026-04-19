@@ -1,0 +1,130 @@
+@import 'react-datepicker/dist/react-datepicker.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #0a0f1e;
+  --bg-secondary: #0d1526;
+  --bg-card: #111827;
+  --bg-elevated: #1a2236;
+  --border: rgba(255,255,255,0.07);
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --accent-cyan: #22d3ee;
+  --accent-violet: #8b5cf6;
+  --accent-emerald: #10b981;
+  --accent-rose: #f43f5e;
+  --accent-amber: #f59e0b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Sora', sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(34, 211, 238, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.04) 0%, transparent 50%);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: #1e2a40; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #253047; }
+
+/* Glass card */
+.glass {
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+.glass-hover:hover {
+  background: rgba(26, 34, 54, 0.8);
+  border-color: rgba(34, 211, 238, 0.15);
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+/* Glow effects */
+.glow-cyan { box-shadow: 0 0 20px rgba(34,211,238,0.15); }
+.glow-violet { box-shadow: 0 0 20px rgba(139,92,246,0.15); }
+
+/* Priority badges */
+.badge-high { @apply bg-rose-500/20 text-rose-400 border border-rose-500/30; }
+.badge-medium { @apply bg-amber-500/20 text-amber-400 border border-amber-500/30; }
+.badge-low { @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
+
+/* Status badges */
+.badge-pending { @apply bg-slate-500/20 text-slate-400 border border-slate-500/30; }
+.badge-in-progress { @apply bg-blue-500/20 text-blue-400 border border-blue-500/30; }
+.badge-completed { @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
+.badge-cancelled { @apply bg-red-500/20 text-red-400 border border-red-500/30; }
+
+/* Inputs */
+.input-dark {
+  @apply w-full bg-dark-600 border border-white/10 rounded-lg px-4 py-2.5
+         text-slate-200 placeholder-slate-500 text-sm
+         focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20
+         transition-all duration-200;
+}
+
+/* Buttons */
+.btn-primary {
+  @apply px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-violet-500 
+         text-white font-medium rounded-lg text-sm
+         hover:opacity-90 active:scale-95
+         transition-all duration-200 shadow-lg;
+}
+
+.btn-ghost {
+  @apply px-4 py-2 rounded-lg text-slate-400 text-sm font-medium
+         hover:bg-white/5 hover:text-slate-200
+         transition-all duration-200;
+}
+
+.btn-danger {
+  @apply px-4 py-2 bg-rose-500/20 text-rose-400 border border-rose-500/30 
+         rounded-lg text-sm font-medium
+         hover:bg-rose-500/30 transition-all duration-200;
+}
+
+/* DatePicker override */
+.react-datepicker { 
+  background: #111827 !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  font-family: 'Sora', sans-serif !important;
+  color: #f1f5f9 !important;
+}
+.react-datepicker__header { background: #1a2236 !important; border-color: rgba(255,255,255,0.07) !important; }
+.react-datepicker__current-month,
+.react-datepicker__day-name,
+.react-datepicker__day { color: #f1f5f9 !important; }
+.react-datepicker__day:hover { background: #253047 !important; }
+.react-datepicker__day--selected { background: #22d3ee !important; color: #0a0f1e !important; }
+.react-datepicker__day--keyboard-selected { background: #22d3ee33 !important; }
+
+/* Animations */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #111827 25%, #1a2236 50%, #111827 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Typing animation for AI */
+@keyframes blink { 0%, 100% { opacity: 1 } 50% { opacity: 0 } }
+.cursor-blink::after {
+  content: '|';
+  animation: blink 0.8s infinite;
+  margin-left: 1px;
+}

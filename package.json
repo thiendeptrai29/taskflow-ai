@@ -1,0 +1,15 @@
+{
+  "name": "taskflow-ai",
+  "version": "1.0.0",
+  "description": "TaskFlow AI - Ứng dụng quản lý công việc thông minh",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "setup": "node setup.js"
+  },
+  "private": true,
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}
