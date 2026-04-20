@@ -50,8 +50,9 @@ export default function AIPage() {
     try {
       const res = await aiAPI.chat({ message: input, history });
       setMessages(m => [...m, { role: 'assistant', content: res.data.reply, time: new Date() }]);
-    } catch {
-      setMessages(m => [...m, { role: 'assistant', content: 'Xin lỗi, tôi đang gặp sự cố kết nối. Vui lòng thử lại!', time: new Date() }]);
+    } catch (error) {
+      const errMsg = (error as any)?.response?.data?.message || (error as any)?.message || 'Lỗi kết nối';
+      setMessages(m => [...m, { role: 'assistant', content: `❌ ${errMsg}`, time: new Date() }]);
     } finally {
       setChatLoading(false);
     }
@@ -70,8 +71,9 @@ export default function AIPage() {
       else if (activeTab === 'analysis') res = await aiAPI.productivityAnalysis(analysisDay);
       else if (activeTab === 'reminders') res = await aiAPI.smartReminders();
       setTabData(res?.data);
-    } catch {
-      toast.error('AI service không khả dụng. Hãy kiểm tra API key!');
+    } catch (err) {
+      const errMsg = (err as any)?.response?.data?.message || (err as any)?.message || 'Lỗi không xác định';
+      toast.error(errMsg);
     } finally {
       setTabLoading(false);
     }
