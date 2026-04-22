@@ -10,6 +10,7 @@
   },
   "private": true,
   "dependencies": {
-    "dotenv": "^17.4.2"
+    "dotenv": "^17.4.2",
+    "mongodb": "^7.2.0"
   }
 }
