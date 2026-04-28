@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-
-=======
 # 🚀 TaskFlow AI — Ứng dụng Quản lý Công việc Thông minh
 
 > Ứng dụng quản lý công việc cá nhân tích hợp AI, xây dựng với React + Node.js + MongoDB + OpenAI
@@ -19,6 +16,7 @@
 - **Thông báo** deadline, nhắc nhở
 - **Upload file đính kèm** vào task
 - **Subtasks** — quản lý công việc con
+- **Dark / Light mode** — chuyển đổi theme toàn app
 
 ### 🤖 AI Features (US-16 → US-20)
 | Tính năng | Mô tả |
@@ -70,9 +68,6 @@
 cd backend
 npm install
 
-
-
-
 # Tạo thư mục uploads
 mkdir uploads
 
@@ -115,20 +110,20 @@ taskflow-ai/
 ├── backend/
 │   ├── src/
 │   │   ├── config/
-│   │   │   └── database.js          # MongoDB connection
+│   │   │   └── database.js
 │   │   ├── controllers/
-│   │   │   ├── authController.js    # Register, login, profile
-│   │   │   ├── taskController.js    # CRUD tasks
-│   │   │   ├── aiController.js      # OpenAI integrations
-│   │   │   ├── statsController.js   # Dashboard stats
-│   │   │   ├── adminController.js   # Admin management
+│   │   │   ├── authController.js
+│   │   │   ├── taskController.js
+│   │   │   ├── aiController.js
+│   │   │   ├── statsController.js
+│   │   │   ├── adminController.js
 │   │   │   └── notificationController.js
 │   │   ├── models/
 │   │   │   ├── User.js
 │   │   │   ├── Task.js
 │   │   │   └── Notification.js
 │   │   ├── middleware/
-│   │   │   └── auth.js              # JWT middleware
+│   │   │   └── auth.js
 │   │   ├── routes/
 │   │   │   ├── auth.js
 │   │   │   ├── tasks.js
@@ -137,7 +132,7 @@ taskflow-ai/
 │   │   │   ├── notifications.js
 │   │   │   └── stats.js
 │   │   └── server.js
-│   ├── uploads/                     # File uploads (auto-created)
+│   ├── uploads/
 │   ├── package.json
 │   └── .env.example
 │
@@ -145,8 +140,8 @@ taskflow-ai/
     ├── src/
     │   ├── components/
     │   │   ├── auth/
-    │   │   │   ├── LoginPage.tsx
-    │   │   │   ├── RegisterPage.tsx
+    │   │   │   ├── LoginPage.tsx        # ✅ Cập nhật UI dark
+    │   │   │   ├── RegisterPage.tsx     # ✅ Cập nhật UI dark
     │   │   │   └── ProfilePage.tsx
     │   │   ├── dashboard/
     │   │   │   └── DashboardPage.tsx
@@ -159,19 +154,23 @@ taskflow-ai/
     │   │   │   └── AIPage.tsx
     │   │   ├── admin/
     │   │   │   └── AdminPage.tsx
+    │   │   ├── settings/
+    │   │   │   └── SettingsPage.tsx     # ✅ Cập nhật dùng ThemeContext
     │   │   └── layout/
     │   │       ├── Layout.tsx
     │   │       └── NotificationPanel.tsx
+    │   ├── context/
+    │   │   └── ThemeContext.tsx         # 🆕 Global dark/light mode
     │   ├── services/
-    │   │   └── api.ts               # Axios API service
+    │   │   └── api.ts
     │   ├── store/
-    │   │   ├── authStore.ts         # Zustand auth
-    │   │   └── taskStore.ts         # Zustand tasks
+    │   │   ├── authStore.ts
+    │   │   └── taskStore.ts
     │   ├── types/
     │   │   └── index.ts
-    │   ├── App.tsx
+    │   ├── App.tsx                      # ✅ Bọc ThemeProvider
     │   ├── main.tsx
-    │   └── index.css
+    │   └── index.css                    # ✅ Thêm pastel light mode
     ├── package.json
     ├── vite.config.ts
     └── tailwind.config.js
@@ -242,8 +241,8 @@ taskflow-ai/
 - **Voice input** yêu cầu trình duyệt hỗ trợ Web Speech API (Chrome, Edge).
 - File upload tối đa 10MB cho task attachments, 5MB cho avatar.
 - MongoDB có thể dùng **MongoDB Atlas** miễn phí: https://cloud.mongodb.com
+- **Dark/Light mode** lưu vào `localStorage`, mặc định là dark mode.
 
 ---
 
 Made with ❤️ | TaskFlow AI © 2024
->>>>>>> 19bdbf1 (Initial commit - Uploading task manager AI code)

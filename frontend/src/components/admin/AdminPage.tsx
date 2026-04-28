@@ -89,7 +89,7 @@ export default function AdminPage() {
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input value={search} onChange={e => setSearch(e.target.value)}
-              className="input-dark pl-8 w-64 text-xs" placeholder="Tìm theo tên, email..." />
+              style={{ paddingLeft: '2rem' }} className="input-dark w-64 text-xs" placeholder="Tìm theo tên, email..." />
           </div>
         </div>
 
