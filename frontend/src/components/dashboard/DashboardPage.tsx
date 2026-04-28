@@ -77,7 +77,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-2xl text-[color:var(--text-primary)]">
             {greeting()}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">{user?.name?.split(' ').pop()} 👋</span>
           </h1>
           <p className="text-slate-400 text-sm mt-1 capitalize">

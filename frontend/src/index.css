@@ -3,7 +3,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================
+   THEME VARIABLES
+========================= */
+
 :root {
+  /* 🌞 LIGHT MODE */
+  --primary: #4f46e5;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f3f4f6;
+  --bg-card: #ffffff;
+  --bg-elevated: #f9fafb;
+  --border: rgba(0,0,0,0.1);
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+}
+
+.dark {
+  /* 🌙 DARK MODE */
+  --primary: #4f46e5;
   --bg-primary: #0a0f1e;
   --bg-secondary: #0d1526;
   --bg-card: #111827;
@@ -11,12 +29,11 @@
   --border: rgba(255,255,255,0.07);
   --text-primary: #f1f5f9;
   --text-secondary: #94a3b8;
-  --accent-cyan: #22d3ee;
-  --accent-violet: #8b5cf6;
-  --accent-emerald: #10b981;
-  --accent-rose: #f43f5e;
-  --accent-amber: #f59e0b;
 }
+
+/* =========================
+   BASE
+========================= */
 
 * { box-sizing: border-box; }
 
@@ -26,105 +43,201 @@ body {
   font-family: 'Sora', sans-serif;
   margin: 0;
   min-height: 100vh;
+
   background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(34, 211, 238, 0.03) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.04) 0%, transparent 50%);
+    radial-gradient(ellipse at 20% 50%, rgba(34, 211, 238, 0.03), transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.04), transparent 50%);
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-secondary); }
-::-webkit-scrollbar-thumb { background: #1e2a40; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #253047; }
+/* =========================
+   SCROLLBAR
+========================= */
 
-/* Glass card */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* =========================
+   GLASS UI
+========================= */
+
 .glass {
-  background: rgba(17, 24, 39, 0.7);
-  backdrop-filter: blur(12px);
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
   border: 1px solid var(--border);
+  border-radius: 16px;
 }
 
 .glass-hover:hover {
-  background: rgba(26, 34, 54, 0.8);
-  border-color: rgba(34, 211, 238, 0.15);
-  transform: translateY(-1px);
+  background: var(--bg-elevated);
+  border-color: var(--primary);
+  transform: translateY(-2px);
   transition: all 0.2s ease;
 }
 
-/* Glow effects */
+/* =========================
+   GLOW
+========================= */
+
 .glow-cyan { box-shadow: 0 0 20px rgba(34,211,238,0.15); }
 .glow-violet { box-shadow: 0 0 20px rgba(139,92,246,0.15); }
 
-/* Priority badges */
+/* =========================
+   BADGES
+========================= */
+
 .badge-high { @apply bg-rose-500/20 text-rose-400 border border-rose-500/30; }
 .badge-medium { @apply bg-amber-500/20 text-amber-400 border border-amber-500/30; }
 .badge-low { @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
 
-/* Status badges */
 .badge-pending { @apply bg-slate-500/20 text-slate-400 border border-slate-500/30; }
 .badge-in-progress { @apply bg-blue-500/20 text-blue-400 border border-blue-500/30; }
 .badge-completed { @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
 .badge-cancelled { @apply bg-red-500/20 text-red-400 border border-red-500/30; }
 
-/* Inputs */
+/* =========================
+   INPUT
+========================= */
+
 .input-dark {
-  @apply w-full bg-dark-600 border border-white/10 rounded-lg px-4 py-2.5
-         text-slate-200 placeholder-slate-500 text-sm
-         focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20
-         transition-all duration-200;
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: 0.2s;
 }
 
-/* Buttons */
+.input-dark::placeholder {
+  color: var(--text-secondary);
+}
+
+.input-dark:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(79,70,229,0.2);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
 .btn-primary {
-  @apply px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-violet-500 
-         text-white font-medium rounded-lg text-sm
-         hover:opacity-90 active:scale-95
-         transition-all duration-200 shadow-lg;
+  padding: 10px 16px;
+  border-radius: 10px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  transition: 0.2s;
+
+  background: linear-gradient(
+    to right,
+    var(--primary),
+    color-mix(in srgb, var(--primary), white 20%)
+  );
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
 }
 
 .btn-ghost {
-  @apply px-4 py-2 rounded-lg text-slate-400 text-sm font-medium
-         hover:bg-white/5 hover:text-slate-200
-         transition-all duration-200;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .btn-danger {
-  @apply px-4 py-2 bg-rose-500/20 text-rose-400 border border-rose-500/30 
-         rounded-lg text-sm font-medium
-         hover:bg-rose-500/30 transition-all duration-200;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgba(244,63,94,0.2);
+  color: #f43f5e;
+  border: 1px solid rgba(244,63,94,0.3);
 }
 
-/* DatePicker override */
+/* =========================
+   SELECT (FIX MẤT CHỮ)
+========================= */
+
+select {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+/* =========================
+   DATEPICKER (FIX FULL)
+========================= */
+
 .react-datepicker { 
-  background: #111827 !important;
-  border-color: rgba(255,255,255,0.1) !important;
-  font-family: 'Sora', sans-serif !important;
-  color: #f1f5f9 !important;
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  color: var(--text-primary) !important;
 }
-.react-datepicker__header { background: #1a2236 !important; border-color: rgba(255,255,255,0.07) !important; }
-.react-datepicker__current-month,
-.react-datepicker__day-name,
-.react-datepicker__day { color: #f1f5f9 !important; }
-.react-datepicker__day:hover { background: #253047 !important; }
-.react-datepicker__day--selected { background: #22d3ee !important; color: #0a0f1e !important; }
-.react-datepicker__day--keyboard-selected { background: #22d3ee33 !important; }
 
-/* Animations */
+.react-datepicker__header { 
+  background: var(--bg-elevated) !important; 
+  border-color: var(--border) !important; 
+}
+
+.react-datepicker__day:hover { 
+  background: var(--bg-secondary) !important; 
+}
+
+.react-datepicker__day--selected { 
+  background: var(--primary) !important; 
+  color: white !important; 
+}
+
+/* =========================
+   ANIMATION
+========================= */
+
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
 .skeleton {
-  background: linear-gradient(90deg, #111827 25%, #1a2236 50%, #111827 75%);
+  background: linear-gradient(
+    90deg,
+    var(--bg-card) 25%,
+    var(--bg-elevated) 50%,
+    var(--bg-card) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
 
-/* Typing animation for AI */
-@keyframes blink { 0%, 100% { opacity: 1 } 50% { opacity: 0 } }
+/* typing cursor */
+@keyframes blink {
+  0%,100% { opacity:1 }
+  50% { opacity:0 }
+}
+
 .cursor-blink::after {
   content: '|';
   animation: blink 0.8s infinite;
-  margin-left: 1px;
+  margin-left: 2px;
 }
