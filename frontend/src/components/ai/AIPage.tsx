@@ -2,14 +2,16 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles, Send, Loader2, Bot, User, RefreshCw,
-  Calendar, TrendingUp, Bell, Lightbulb, Mic, MicOff
+  Calendar, TrendingUp, Bell, Lightbulb, Mic, MicOff,
+  Plus, Trash2, MessageSquare, ChevronLeft
 } from 'lucide-react';
 import { aiAPI } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
+import api from '../../services/api';
 import toast from 'react-hot-toast';
 
 interface Message { role: 'user' | 'assistant'; content: string; time: Date; }
-
+interface Session { sessionId: string; title: string; messageCount: number; preview: string; lastMessage: string; }
 type AITab = 'chat' | 'suggest' | 'schedule' | 'analysis' | 'reminders';
 
 const TABS: { id: AITab; icon: any; label: string }[] = [
@@ -20,38 +22,146 @@ const TABS: { id: AITab; icon: any; label: string }[] = [
   { id: 'reminders', icon: Bell, label: 'Nhắc nhở' },
 ];
 
+const WELCOME_MSG: Message = {
+  role: 'assistant',
+  content: `Xin chào! 👋 Tôi là TaskFlow AI Assistant. Tôi có thể giúp bạn:\n• 💡 Gợi ý ưu tiên công việc\n• 📅 Lên lịch làm việc tối ưu\n• 📊 Phân tích năng suất\n• 🔔 Nhắc nhở thông minh\n\nHãy hỏi tôi bất cứ điều gì!`,
+  time: new Date()
+};
+
 export default function AIPage() {
   const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState<AITab>('chat');
-  const [messages, setMessages] = useState<Message[]>([{
-    role: 'assistant',
-    content: `Xin chào ${user?.name}! 👋 Tôi là TaskFlow AI Assistant. Tôi có thể giúp bạn:\n• 💡 Gợi ý ưu tiên công việc\n• 📅 Lên lịch làm việc tối ưu\n• 📊 Phân tích năng suất\n• 🔔 Nhắc nhở thông minh\n\nHãy hỏi tôi bất cứ điều gì!`,
-    time: new Date()
-  }]);
+
+  // Chat state
+  const [messages, setMessages] = useState<Message[]>([WELCOME_MSG]);
   const [input, setInput] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+
+  // Session state
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [showSessions, setShowSessions] = useState(false);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
+
+  // Other tabs
   const [tabData, setTabData] = useState<any>(null);
   const [tabLoading, setTabLoading] = useState(false);
   const [analysisDay, setAnalysisDay] = useState(7);
   const [scheduleDate, setScheduleDate] = useState(new Date().toISOString().split('T')[0]);
-  const [isRecording, setIsRecording] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
+  // Load danh sách sessions
+  const loadSessions = async () => {
+    setSessionsLoading(true);
+    try {
+      const res = await api.get('/chat/sessions');
+      setSessions(res.data.sessions);
+    } catch {
+      // Ignore nếu chưa có session nào
+    } finally {
+      setSessionsLoading(false);
+    }
+  };
+
+  useEffect(() => { loadSessions(); }, []);
+
+  // Tạo session mới
+  const createNewSession = async () => {
+    try {
+      const res = await api.post('/chat/sessions', { title: 'Cuộc trò chuyện mới' });
+      const sid = res.data.session.sessionId;
+      setCurrentSessionId(sid);
+      setMessages([WELCOME_MSG]);
+      setShowSessions(false);
+      await loadSessions();
+    } catch {
+      // Nếu lỗi vẫn dùng được, chỉ không lưu được
+      setCurrentSessionId(null);
+      setMessages([WELCOME_MSG]);
+    }
+  };
+
+  // Load session cũ
+  const loadSession = async (sessionId: string) => {
+    try {
+      const res = await api.get(`/chat/sessions/${sessionId}`);
+      const msgs: Message[] = res.data.session.messages.map((m: any) => ({
+        role: m.role, content: m.content, time: new Date(m.time)
+      }));
+      setMessages(msgs.length > 0 ? msgs : [WELCOME_MSG]);
+      setCurrentSessionId(sessionId);
+      setShowSessions(false);
+    } catch {
+      toast.error('Không thể tải session');
+    }
+  };
+
+  // Xóa session
+  const deleteSession = async (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await api.delete(`/chat/sessions/${sessionId}`);
+      if (currentSessionId === sessionId) {
+        setCurrentSessionId(null);
+        setMessages([WELCOME_MSG]);
+      }
+      await loadSessions();
+      toast.success('Đã xóa session');
+    } catch {
+      toast.error('Xóa thất bại');
+    }
+  };
+
+  // Lưu messages vào DB sau mỗi lượt chat
+  const saveToHistory = async (sessionId: string, newMessages: { role: string; content: string }[]) => {
+    try {
+      await api.post(`/chat/sessions/${sessionId}/messages`, { messages: newMessages });
+      await loadSessions();
+    } catch {
+      // Không crash nếu lưu thất bại
+    }
+  };
+
   const sendMessage = async () => {
     if (!input.trim() || chatLoading) return;
+
     const userMsg: Message = { role: 'user', content: input, time: new Date() };
     const history = messages.slice(-8).map(m => ({ role: m.role, content: m.content }));
+    const currentInput = input;
+
     setMessages(m => [...m, userMsg]);
     setInput('');
     setChatLoading(true);
+
     try {
-      const res = await aiAPI.chat({ message: input, history });
-      setMessages(m => [...m, { role: 'assistant', content: res.data.reply, time: new Date() }]);
-    } catch (error) {
-      const errMsg = (error as any)?.response?.data?.message || (error as any)?.message || 'Lỗi kết nối';
+      // Tạo session nếu chưa có
+      let sid = currentSessionId;
+      if (!sid) {
+        try {
+          const res = await api.post('/chat/sessions', { title: currentInput.slice(0, 50) });
+          sid = res.data.session.sessionId;
+          setCurrentSessionId(sid);
+        } catch { sid = null; }
+      }
+
+      const res = await aiAPI.chat({ message: currentInput, history });
+      const assistantMsg: Message = { role: 'assistant', content: res.data.reply, time: new Date() };
+      setMessages(m => [...m, assistantMsg]);
+
+      // ✅ Lưu vào DB
+      if (sid) {
+        await saveToHistory(sid, [
+          { role: 'user', content: currentInput },
+          { role: 'assistant', content: res.data.reply }
+        ]);
+      }
+    } catch (error: any) {
+      const errMsg = error?.response?.data?.message || error?.message || 'Lỗi kết nối';
       setMessages(m => [...m, { role: 'assistant', content: `❌ ${errMsg}`, time: new Date() }]);
     } finally {
       setChatLoading(false);
@@ -64,44 +174,31 @@ export default function AIPage() {
     try {
       let res;
       if (activeTab === 'suggest') res = await aiAPI.suggestPriority();
-      else if (activeTab === 'schedule') res = await aiAPI.autoSchedule({
-        date: scheduleDate,
-        workingHours: user?.workingHours
-      });
+      else if (activeTab === 'schedule') res = await aiAPI.autoSchedule({ date: scheduleDate, workingHours: user?.workingHours });
       else if (activeTab === 'analysis') res = await aiAPI.productivityAnalysis(analysisDay);
       else if (activeTab === 'reminders') res = await aiAPI.smartReminders();
       setTabData(res?.data);
-    } catch (err) {
-      const errMsg = (err as any)?.response?.data?.message || (err as any)?.message || 'Lỗi không xác định';
+    } catch (err: any) {
+      const errMsg = err?.response?.data?.message || err?.message || 'Lỗi không xác định';
       toast.error(errMsg);
     } finally {
       setTabLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (activeTab !== 'chat') { setTabData(null); }
-  }, [activeTab]);
+  useEffect(() => { if (activeTab !== 'chat') { setTabData(null); } }, [activeTab]);
 
   const toggleVoice = () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) { toast.error('Trình duyệt không hỗ trợ nhận giọng nói'); return; }
     if (isRecording) {
-      recognitionRef.current?.stop();
-      setIsRecording(false);
+      recognitionRef.current?.stop(); setIsRecording(false);
     } else {
       const recognition = new SR();
-      recognition.lang = 'vi-VN';
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.onresult = (e: any) => {
-        setInput(e.results[0][0].transcript);
-        setIsRecording(false);
-      };
+      recognition.lang = 'vi-VN'; recognition.continuous = false; recognition.interimResults = false;
+      recognition.onresult = (e: any) => { setInput(e.results[0][0].transcript); setIsRecording(false); };
       recognition.onerror = () => setIsRecording(false);
-      recognition.start();
-      recognitionRef.current = recognition;
-      setIsRecording(true);
+      recognition.start(); recognitionRef.current = recognition; setIsRecording(true);
     }
   };
 
@@ -115,23 +212,77 @@ export default function AIPage() {
   return (
     <div className="space-y-5 animate-fade-in h-[calc(100vh-8rem)] flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-3 flex-shrink-0">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center shadow-lg animate-float">
-          <Sparkles size={20} className="text-white" />
+      <div className="flex items-center justify-between flex-shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center shadow-lg animate-float">
+            <Sparkles size={20} className="text-white" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-white">AI Assistant</h1>
+            <p className="text-slate-400 text-xs">Powered by Groq • Llama 3.1</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-xl font-bold text-white">AI Assistant</h1>
-          <p className="text-slate-400 text-xs">Powered by OpenAI GPT</p>
-        </div>
+        {/* Session controls */}
+        {activeTab === 'chat' && (
+          <div className="flex items-center gap-2">
+            <button onClick={createNewSession}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white text-xs transition-all">
+              <Plus size={13} /> Mới
+            </button>
+            <button onClick={() => { setShowSessions(!showSessions); loadSessions(); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white text-xs transition-all">
+              <MessageSquare size={13} /> Lịch sử ({sessions.length})
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Session history panel */}
+      <AnimatePresence>
+        {showSessions && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+            className="glass rounded-2xl overflow-hidden flex-shrink-0">
+            <div className="p-3 border-b border-white/5 flex items-center justify-between">
+              <span className="text-xs font-semibold text-slate-300">Lịch sử trò chuyện</span>
+              <button onClick={() => setShowSessions(false)} className="text-slate-500 hover:text-white">
+                <ChevronLeft size={14} />
+              </button>
+            </div>
+            <div className="max-h-48 overflow-y-auto">
+              {sessionsLoading ? (
+                <div className="p-4 text-center text-slate-500 text-xs">Đang tải...</div>
+              ) : sessions.length === 0 ? (
+                <div className="p-4 text-center text-slate-500 text-xs">Chưa có lịch sử chat</div>
+              ) : (
+                sessions.map(s => (
+                  <div key={s.sessionId} onClick={() => loadSession(s.sessionId)}
+                    className={`flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 cursor-pointer transition-all group ${currentSessionId === s.sessionId ? 'bg-cyan-500/10 border-l-2 border-cyan-500' : ''}`}>
+                    <MessageSquare size={14} className="text-slate-500 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-slate-200 text-xs font-medium truncate">{s.title}</p>
+                      <p className="text-slate-600 text-xs truncate">{s.preview}</p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-slate-600 text-xs">{s.messageCount} tin</span>
+                      <button onClick={(e) => deleteSession(s.sessionId, e)}
+                        className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 transition-all">
+                        <Trash2 size={11} />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Tabs */}
       <div className="flex gap-1 bg-dark-600 p-1 rounded-xl flex-shrink-0 overflow-x-auto">
         {TABS.map(({ id, icon: Icon, label }) => (
           <button key={id} onClick={() => setActiveTab(id)}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex-shrink-0
-              ${activeTab === id ? 'bg-gradient-to-r from-cyan-500/20 to-violet-500/20 text-cyan-400 border border-cyan-500/20' : 'text-slate-400 hover:text-slate-200'}`}
-          >
+              ${activeTab === id ? 'bg-gradient-to-r from-cyan-500/20 to-violet-500/20 text-cyan-400 border border-cyan-500/20' : 'text-slate-400 hover:text-slate-200'}`}>
             <Icon size={14} /> {label}
           </button>
         ))}
@@ -143,8 +294,7 @@ export default function AIPage() {
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.map((msg, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
-              >
+                className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                 <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${msg.role === 'assistant' ? 'bg-gradient-to-br from-cyan-500 to-violet-500' : 'bg-dark-400 border border-white/10'}`}>
                   {msg.role === 'assistant' ? <Bot size={16} className="text-white" /> : <User size={16} className="text-slate-300" />}
                 </div>
@@ -183,6 +333,11 @@ export default function AIPage() {
 
           {/* Input */}
           <div className="p-4 border-t border-white/5">
+            {currentSessionId && (
+              <p className="text-slate-600 text-xs mb-2 flex items-center gap-1">
+                <MessageSquare size={10} /> Đang lưu vào lịch sử
+              </p>
+            )}
             <div className="flex gap-2">
               <div className="flex-1 relative">
                 <input value={input} onChange={e => setInput(e.target.value)}
@@ -205,7 +360,6 @@ export default function AIPage() {
       {/* Other tabs */}
       {activeTab !== 'chat' && (
         <div className="flex-1 glass rounded-2xl p-5 overflow-y-auto min-h-0">
-          {/* Tab controls */}
           <div className="flex items-center justify-between mb-5">
             <div>
               {activeTab === 'analysis' && (
@@ -229,7 +383,6 @@ export default function AIPage() {
             <div className="text-center py-16">
               <Sparkles size={48} className="mx-auto text-slate-700 mb-4" />
               <p className="text-slate-400 font-medium">Nhấn "Phân tích với AI" để bắt đầu</p>
-              <p className="text-slate-600 text-sm mt-1">AI sẽ phân tích dữ liệu công việc của bạn</p>
             </div>
           )}
 
@@ -250,12 +403,9 @@ export default function AIPage() {
               <div className="space-y-3">
                 {(tabData.suggestions || []).map((s: any, i: number) => (
                   <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
-                    className="p-4 rounded-xl bg-white/3 border border-white/5 hover:border-white/10 transition-all"
-                  >
+                    className="p-4 rounded-xl bg-white/3 border border-white/5 hover:border-white/10 transition-all">
                     <div className="flex items-start gap-3">
-                      <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                        {i + 1}
-                      </span>
+                      <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">{i + 1}</span>
                       <div className="flex-1">
                         <p className="font-semibold text-white text-sm">{s.task?.title || s.title}</p>
                         <p className="text-slate-400 text-xs mt-1 leading-relaxed">{s.reason}</p>
@@ -281,8 +431,7 @@ export default function AIPage() {
             <div className="space-y-4">
               {(tabData.schedule || []).map((slot: any, i: number) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
-                  className="flex gap-4 p-4 rounded-xl bg-white/3 border border-white/5"
-                >
+                  className="flex gap-4 p-4 rounded-xl bg-white/3 border border-white/5">
                   <div className="text-right flex-shrink-0 w-24">
                     <p className="text-cyan-400 font-mono text-xs font-semibold">{slot.startTime}</p>
                     <p className="text-slate-600 font-mono text-xs">{slot.endTime}</p>
@@ -294,12 +443,10 @@ export default function AIPage() {
                   </div>
                 </motion.div>
               ))}
-              {tabData.tips && tabData.tips.length > 0 && (
+              {tabData.tips?.length > 0 && (
                 <div className="p-4 rounded-xl bg-violet-500/10 border border-violet-500/20 mt-4">
                   <p className="text-violet-300 text-xs font-semibold mb-2">💡 Tips từ AI:</p>
-                  {tabData.tips.map((tip: string, i: number) => (
-                    <p key={i} className="text-slate-300 text-xs leading-relaxed mt-1">• {tip}</p>
-                  ))}
+                  {tabData.tips.map((tip: string, i: number) => <p key={i} className="text-slate-300 text-xs mt-1">• {tip}</p>)}
                 </div>
               )}
             </div>
@@ -308,22 +455,19 @@ export default function AIPage() {
           {/* Analysis */}
           {activeTab === 'analysis' && tabData && (
             <div className="space-y-4">
-              {/* Score */}
               {tabData.analysis?.score !== undefined && (
                 <div className="p-5 rounded-xl bg-gradient-to-br from-cyan-500/10 to-violet-500/10 border border-white/10 text-center">
                   <p className="text-slate-400 text-sm mb-2">Điểm năng suất</p>
                   <p className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">
-                    {tabData.analysis.score}
-                    <span className="text-2xl text-slate-500">/100</span>
+                    {tabData.analysis.score}<span className="text-2xl text-slate-500">/100</span>
                   </p>
                 </div>
               )}
-              {/* Stats */}
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { label: 'Tổng task', val: tabData.stats?.total, color: 'text-cyan-400' },
                   { label: 'Hoàn thành', val: tabData.stats?.completed, color: 'text-emerald-400' },
-                  { label: 'Hoàn thành %', val: `${tabData.stats?.completionRate}%`, color: 'text-violet-400' },
+                  { label: 'Tỉ lệ', val: `${tabData.stats?.completionRate}%`, color: 'text-violet-400' },
                 ].map(({ label, val, color }) => (
                   <div key={label} className="p-3 rounded-xl bg-white/3 border border-white/5 text-center">
                     <p className={`text-xl font-bold ${color}`}>{val}</p>
@@ -331,13 +475,11 @@ export default function AIPage() {
                   </div>
                 ))}
               </div>
-              {/* Analysis text */}
               {tabData.analysis?.analysis && (
                 <div className="p-4 rounded-xl bg-white/3 border border-white/5">
                   <p className="text-slate-300 text-sm leading-relaxed">{tabData.analysis.analysis}</p>
                 </div>
               )}
-              {/* Strengths & improvements */}
               <div className="grid grid-cols-2 gap-3">
                 {tabData.analysis?.strengths?.length > 0 && (
                   <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
@@ -362,8 +504,7 @@ export default function AIPage() {
                 <p className="text-center text-slate-500 py-8">Không có task nào sắp đến hạn trong 72 giờ tới 🎉</p>
               ) : (tabData.reminders || []).map((r: any, i: number) => (
                 <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
-                  className={`p-4 rounded-xl border ${r.urgency === 'high' ? 'bg-rose-500/10 border-rose-500/20' : r.urgency === 'medium' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-blue-500/10 border-blue-500/20'}`}
-                >
+                  className={`p-4 rounded-xl border ${r.urgency === 'high' ? 'bg-rose-500/10 border-rose-500/20' : r.urgency === 'medium' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-blue-500/10 border-blue-500/20'}`}>
                   <div className="flex items-start gap-3">
                     <Bell size={16} className={r.urgency === 'high' ? 'text-rose-400' : r.urgency === 'medium' ? 'text-amber-400' : 'text-blue-400'} />
                     <div>

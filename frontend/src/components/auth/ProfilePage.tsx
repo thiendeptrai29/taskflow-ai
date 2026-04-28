@@ -5,6 +5,14 @@ import { useAuthStore } from '../../store/authStore';
 import { authAPI } from '../../services/api';
 import toast from 'react-hot-toast';
 
+// Reusable input row với icon — không dùng absolute nữa
+const InputRow = ({ icon: Icon, children }: { icon: any; children: React.ReactNode }) => (
+  <div className="flex items-center gap-3 bg-[#1a2236] border border-white/10 rounded-lg px-4 py-2.5 focus-within:border-cyan-500/50 focus-within:ring-1 focus-within:ring-cyan-500/20 transition-all">
+    <Icon size={15} className="text-slate-500 flex-shrink-0" />
+    {children}
+  </div>
+);
+
 export default function ProfilePage() {
   const { user, updateUser } = useAuthStore();
   const [name, setName] = useState(user?.name || '');
@@ -35,11 +43,13 @@ export default function ProfilePage() {
   const handlePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentPassword || !newPassword) return toast.error('Vui lòng điền đầy đủ');
+    if (newPassword.length < 6) return toast.error('Mật khẩu mới phải ít nhất 6 ký tự');
     setPwLoading(true);
     try {
       await authAPI.changePassword({ currentPassword, newPassword });
       toast.success('Đổi mật khẩu thành công!');
-      setCurrentPassword(''); setNewPassword('');
+      setCurrentPassword('');
+      setNewPassword('');
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Đổi mật khẩu thất bại');
     } finally {
@@ -53,15 +63,16 @@ export default function ProfilePage() {
 
       {/* Avatar & info */}
       <div className="glass rounded-2xl p-6">
+        {/* Avatar */}
         <div className="flex items-center gap-5 mb-6">
-          <div className="relative">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-white text-2xl font-bold shadow-xl">
+          <div className="relative flex-shrink-0">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-white text-2xl font-bold shadow-xl overflow-hidden">
               {user?.avatar
-                ? <img src={user.avatar} className="w-20 h-20 rounded-2xl object-cover" alt="" />
-                : user?.name?.[0]?.toUpperCase()
+                ? <img src={user.avatar} className="w-full h-full object-cover" alt="" />
+                : <span>{user?.name?.[0]?.toUpperCase()}</span>
               }
             </div>
-            <button className="absolute -bottom-2 -right-2 w-7 h-7 bg-dark-500 border border-white/10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+            <button className="absolute -bottom-2 -right-2 w-7 h-7 bg-[#1a2236] border border-white/10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition-colors">
               <Camera size={12} />
             </button>
           </div>
@@ -77,14 +88,20 @@ export default function ProfilePage() {
         </div>
 
         <form onSubmit={handleProfile} className="space-y-4">
+          {/* Tên */}
           <div>
             <label className="block text-slate-400 text-xs font-medium mb-1.5">Họ và tên</label>
-            <div className="relative">
-              <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-              <input value={name} onChange={e => setName(e.target.value)} className="input-dark pl-9" placeholder="Tên của bạn" />
-            </div>
+            <InputRow icon={User}>
+              <input
+                value={name}
+                onChange={e => setName(e.target.value)}
+                className="flex-1 bg-transparent text-slate-200 placeholder-slate-500 text-sm outline-none"
+                placeholder="Tên của bạn"
+              />
+            </InputRow>
           </div>
 
+          {/* Giờ làm việc */}
           <div>
             <label className="block text-slate-400 text-xs font-medium mb-1.5 flex items-center gap-1.5">
               <Clock size={13} /> Giờ làm việc
@@ -92,38 +109,69 @@ export default function ProfilePage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <p className="text-slate-600 text-xs mb-1">Bắt đầu</p>
-                <input type="time" value={workStart} onChange={e => setWorkStart(e.target.value)} className="input-dark" />
+                <div className="flex items-center gap-3 bg-[#1a2236] border border-white/10 rounded-lg px-4 py-2.5">
+                  <input
+                    type="time"
+                    value={workStart}
+                    onChange={e => setWorkStart(e.target.value)}
+                    className="flex-1 bg-transparent text-slate-200 text-sm outline-none"
+                  />
+                </div>
               </div>
               <div>
                 <p className="text-slate-600 text-xs mb-1">Kết thúc</p>
-                <input type="time" value={workEnd} onChange={e => setWorkEnd(e.target.value)} className="input-dark" />
+                <div className="flex items-center gap-3 bg-[#1a2236] border border-white/10 rounded-lg px-4 py-2.5">
+                  <input
+                    type="time"
+                    value={workEnd}
+                    onChange={e => setWorkEnd(e.target.value)}
+                    className="flex-1 bg-transparent text-slate-200 text-sm outline-none"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          <button type="submit" disabled={loading} className="btn-primary flex items-center gap-2">
+          <button type="submit" disabled={loading}
+            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-violet-500 text-white font-medium rounded-lg text-sm hover:opacity-90 active:scale-95 transition-all disabled:opacity-60">
             {loading ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
             Lưu thay đổi
           </button>
         </form>
       </div>
 
-      {/* Change password */}
+      {/* Đổi mật khẩu */}
       <div className="glass rounded-2xl p-6">
         <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
           <Lock size={16} className="text-violet-400" /> Đổi mật khẩu
         </h3>
         <form onSubmit={handlePassword} className="space-y-4">
-          {[
-            { label: 'Mật khẩu hiện tại', val: currentPassword, set: setCurrentPassword },
-            { label: 'Mật khẩu mới', val: newPassword, set: setNewPassword },
-          ].map(({ label, val, set }) => (
-            <div key={label}>
-              <label className="block text-slate-400 text-xs font-medium mb-1.5">{label}</label>
-              <input type="password" value={val} onChange={e => set(e.target.value)} className="input-dark" placeholder="••••••••" />
-            </div>
-          ))}
-          <button type="submit" disabled={pwLoading} className="btn-primary flex items-center gap-2">
+          <div>
+            <label className="block text-slate-400 text-xs font-medium mb-1.5">Mật khẩu hiện tại</label>
+            <InputRow icon={Lock}>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={e => setCurrentPassword(e.target.value)}
+                className="flex-1 bg-transparent text-slate-200 placeholder-slate-500 text-sm outline-none"
+                placeholder="••••••••"
+              />
+            </InputRow>
+          </div>
+          <div>
+            <label className="block text-slate-400 text-xs font-medium mb-1.5">Mật khẩu mới</label>
+            <InputRow icon={Lock}>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+                className="flex-1 bg-transparent text-slate-200 placeholder-slate-500 text-sm outline-none"
+                placeholder="••••••••"
+              />
+            </InputRow>
+          </div>
+          <button type="submit" disabled={pwLoading}
+            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-500 to-rose-500 text-white font-medium rounded-lg text-sm hover:opacity-90 active:scale-95 transition-all disabled:opacity-60">
             {pwLoading ? <Loader2 size={15} className="animate-spin" /> : <Lock size={15} />}
             Đổi mật khẩu
           </button>

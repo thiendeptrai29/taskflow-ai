@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Pages
 import LoginPage from './components/auth/LoginPage';
@@ -13,8 +14,6 @@ import AIPage from './components/ai/AIPage';
 import AdminPage from './components/admin/AdminPage';
 import Layout from './components/layout/Layout';
 import ProfilePage from './components/auth/ProfilePage';
-
-// 🔥 THÊM SETTINGS PAGE
 import SettingsPage from './components/settings/SettingsPage';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -57,55 +56,55 @@ export default function App() {
   }, []);
 
   return (
-    <BrowserRouter>
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          style: {
-            background: '#111827',
-            color: '#f1f5f9',
-            border: '1px solid rgba(255,255,255,0.1)',
-          },
-          success: {
-            iconTheme: { primary: '#10b981', secondary: '#111827' },
-          },
-          error: {
-            iconTheme: { primary: '#f43f5e', secondary: '#111827' },
-          },
-        }}
-      />
+    <ThemeProvider>
+      <BrowserRouter>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: '#111827',
+              color: '#f1f5f9',
+              border: '1px solid rgba(255,255,255,0.1)',
+            },
+            success: {
+              iconTheme: { primary: '#10b981', secondary: '#111827' },
+            },
+            error: {
+              iconTheme: { primary: '#f43f5e', secondary: '#111827' },
+            },
+          }}
+        />
 
-      <Routes>
-        {/* Public */}
-        <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-        <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+        <Routes>
+          {/* Public */}
+          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+          <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
 
-        {/* Private Layout */}
-        <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
+          {/* Private Layout */}
+          <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
+            <Route index element={<Navigate to="/dashboard" replace />} />
 
-          <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="tasks" element={<TasksPage />} />
-          <Route path="calendar" element={<CalendarPage />} />
-          <Route path="ai" element={<AIPage />} />
-          <Route path="profile" element={<ProfilePage />} />
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="tasks" element={<TasksPage />} />
+            <Route path="calendar" element={<CalendarPage />} />
+            <Route path="ai" element={<AIPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="settings" element={<SettingsPage />} />
 
-          {/* 🔥 FIX CHÍNH Ở ĐÂY */}
-          <Route path="settings" element={<SettingsPage />} />
+            <Route
+              path="admin"
+              element={
+                <AdminRoute>
+                  <AdminPage />
+                </AdminRoute>
+              }
+            />
+          </Route>
 
-          <Route
-            path="admin"
-            element={
-              <AdminRoute>
-                <AdminPage />
-              </AdminRoute>
-            }
-          />
-        </Route>
-
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }

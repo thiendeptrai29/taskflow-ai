@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   CheckCircle2, Clock, AlertTriangle, TrendingUp,
-  Sparkles, Plus, ArrowRight, Zap, Target
+  Sparkles, Plus, ArrowRight, Zap, Target, RefreshCw
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -35,22 +35,43 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [upcomingTasks, setUpcomingTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const [statsRes, tasksRes] = await Promise.all([
-          statsAPI.getUserStats(),
-          taskAPI.getAll({ status: 'pending', sort: 'deadline', limit: '5' } as any)
-        ]);
-        setStats(statsRes.data.stats);
-        setUpcomingTasks(tasksRes.data.tasks.filter((t: Task) => t.deadline).slice(0, 5));
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+  // ✅ FIX: tách load thành callback để có thể gọi lại bất cứ lúc nào
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
+    else setRefreshing(true);
+    try {
+      const [statsRes, tasksRes] = await Promise.all([
+        statsAPI.getUserStats(),
+        taskAPI.getAll({ status: 'pending', sort: 'deadline' } as any)
+      ]);
+      setStats(statsRes.data.stats);
+      setUpcomingTasks(tasksRes.data.tasks.filter((t: Task) => t.deadline).slice(0, 5));
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  // ✅ FIX: lắng nghe event 'task-created' từ AI hoặc bất kỳ nơi nào
+  useEffect(() => {
+    const handler = () => load(true);
+    window.addEventListener('task-created', handler);
+    window.addEventListener('task-updated', handler);
+    return () => {
+      window.removeEventListener('task-created', handler);
+      window.removeEventListener('task-updated', handler);
+    };
+  }, [load]);
+
+  // ✅ FIX: Auto refresh mỗi 60 giây
+  useEffect(() => {
+    const interval = setInterval(() => load(true), 60000);
+    return () => clearInterval(interval);
+  }, [load]);
 
   const greeting = () => {
     const h = new Date().getHours();
@@ -77,26 +98,38 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl text-[color:var(--text-primary)]">
-            {greeting()}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">{user?.name?.split(' ').pop()} 👋</span>
+          <h1 className="text-2xl font-bold text-white">
+            {greeting()}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">
+              {user?.name?.split(' ').pop()} 👋
+            </span>
           </h1>
           <p className="text-slate-400 text-sm mt-1 capitalize">
             {format(new Date(), "EEEE, d MMMM yyyy", { locale: vi })}
           </p>
         </div>
-        <Link to="/tasks" className="btn-primary flex items-center gap-2 text-sm">
-          <Plus size={16} /> Tạo task mới
-        </Link>
+        <div className="flex items-center gap-2">
+          {/* ✅ FIX: nút refresh thủ công */}
+          <button onClick={() => load(true)} disabled={refreshing}
+            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+          </button>
+          <Link to="/tasks" className="btn-primary flex items-center gap-2 text-sm">
+            <Plus size={16} /> Tạo task mới
+          </Link>
+        </div>
       </div>
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={Target} label="Tổng công việc" value={stats?.total ?? 0} color="bg-gradient-to-br from-cyan-500 to-cyan-600" />
+        <StatCard icon={Target} label="Tổng công việc" value={stats?.total ?? 0}
+          color="bg-gradient-to-br from-cyan-500 to-cyan-600" />
         <StatCard icon={CheckCircle2} label="Đã hoàn thành" value={stats?.completed ?? 0}
           color="bg-gradient-to-br from-emerald-500 to-emerald-600"
           sub={`Tỉ lệ ${stats?.completionRate ?? 0}%`} />
-        <StatCard icon={Clock} label="Đang thực hiện" value={stats?.pending ?? 0} color="bg-gradient-to-br from-amber-500 to-amber-600" />
-        <StatCard icon={AlertTriangle} label="Quá hạn" value={stats?.overdue ?? 0} color="bg-gradient-to-br from-rose-500 to-rose-600" />
+        <StatCard icon={Clock} label="Đang thực hiện" value={stats?.pending ?? 0}
+          color="bg-gradient-to-br from-amber-500 to-amber-600" />
+        <StatCard icon={AlertTriangle} label="Quá hạn" value={stats?.overdue ?? 0}
+          color="bg-gradient-to-br from-rose-500 to-rose-600" />
       </div>
 
       {/* Charts row */}
@@ -122,10 +155,7 @@ export default function DashboardPage() {
               </defs>
               <XAxis dataKey="date" tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <Tooltip
-                contentStyle={{ background: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#f1f5f9', fontSize: '12px' }}
-                cursor={{ stroke: 'rgba(255,255,255,0.05)' }}
-              />
+              <Tooltip contentStyle={{ background: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#f1f5f9', fontSize: '12px' }} cursor={{ stroke: 'rgba(255,255,255,0.05)' }} />
               <Area type="monotone" dataKey="created" name="Tạo mới" stroke="#22d3ee" strokeWidth={2} fill="url(#colorCreated)" />
               <Area type="monotone" dataKey="completed" name="Hoàn thành" stroke="#10b981" strokeWidth={2} fill="url(#colorCompleted)" />
             </AreaChart>
@@ -146,10 +176,7 @@ export default function DashboardPage() {
                       <Cell key={entry._id} fill={PRIORITY_COLORS[entry._id] || '#475569'} />
                     ))}
                   </Pie>
-                  <Tooltip
-                    contentStyle={{ background: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '12px', color: '#f1f5f9' }}
-                    formatter={(v: any, n: string) => [v, n === 'high' ? 'Cao' : n === 'medium' ? 'Trung bình' : 'Thấp']}
-                  />
+                  <Tooltip contentStyle={{ background: '#111827', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '12px', color: '#f1f5f9' }} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="space-y-1.5 mt-2">
@@ -189,8 +216,7 @@ export default function DashboardPage() {
           <div className="space-y-2">
             {upcomingTasks.map(task => (
               <motion.div key={task._id} whileHover={{ x: 2 }}
-                className="flex items-center gap-4 p-3 rounded-xl bg-white/3 hover:bg-white/5 transition-all"
-              >
+                className="flex items-center gap-4 p-3 rounded-xl bg-white/3 hover:bg-white/5 transition-all">
                 <div className={`w-2 h-2 rounded-full flex-shrink-0 ${task.priority === 'high' ? 'bg-rose-400' : task.priority === 'medium' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
                 <div className="flex-1 min-w-0">
                   <p className="text-slate-200 text-sm font-medium truncate">{task.title}</p>
@@ -212,9 +238,7 @@ export default function DashboardPage() {
       {/* AI Banner */}
       <Link to="/ai">
         <motion.div whileHover={{ scale: 1.01 }}
-          className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-r from-cyan-500/10 via-violet-500/10 to-rose-500/10 border border-white/10 cursor-pointer group"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-violet-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-r from-cyan-500/10 via-violet-500/10 to-rose-500/10 border border-white/10 cursor-pointer group">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center shadow-xl animate-float">
               <Sparkles size={28} className="text-white" />
