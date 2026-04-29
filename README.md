@@ -105,7 +105,6 @@ db.users.updateOne(
 
 ## 📁 Cấu trúc thư mục
 
-```
 taskflow-ai/
 ├── backend/
 │   ├── src/
@@ -141,8 +140,8 @@ taskflow-ai/
     │   ├── components/
     │   │   ├── auth/
     │   │   │   ├── LoginPage.tsx        # ✅ Cập nhật UI dark
-    │   │   │   ├── RegisterPage.tsx     # ✅ Cập nhật UI dark
-    │   │   │   └── ProfilePage.tsx
+    │   │   │   └── RegisterPage.tsx     # ✅ Cập nhật UI dark
+    │   │   │   # 🗑️ ProfilePage.tsx đã xóa → merge vào Settings
     │   │   ├── dashboard/
     │   │   │   └── DashboardPage.tsx
     │   │   ├── tasks/
@@ -155,9 +154,9 @@ taskflow-ai/
     │   │   ├── admin/
     │   │   │   └── AdminPage.tsx
     │   │   ├── settings/
-    │   │   │   └── SettingsPage.tsx     # ✅ Cập nhật dùng ThemeContext
+    │   │   │   └── SettingsPage.tsx     # ✅ Merge Profile + ThemeContext
     │   │   └── layout/
-    │   │       ├── Layout.tsx
+    │   │       ├── Layout.tsx          
     │   │       └── NotificationPanel.tsx
     │   ├── context/
     │   │   └── ThemeContext.tsx         # 🆕 Global dark/light mode
@@ -168,13 +167,12 @@ taskflow-ai/
     │   │   └── taskStore.ts
     │   ├── types/
     │   │   └── index.ts
-    │   ├── App.tsx                      # ✅ Bọc ThemeProvider
+    │   ├── App.tsx                      # ✅ Bỏ route /profile + ThemeProvider
     │   ├── main.tsx
     │   └── index.css                    # ✅ Thêm pastel light mode
     ├── package.json
     ├── vite.config.ts
     └── tailwind.config.js
-```
 
 ---
 

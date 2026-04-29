@@ -3,8 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
 import { ThemeProvider } from './context/ThemeContext';
+import { LanguageProvider } from './context/LanguageContext';
 
-// Pages
 import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
 import DashboardPage from './components/dashboard/DashboardPage';
@@ -13,7 +13,6 @@ import CalendarPage from './components/tasks/CalendarPage';
 import AIPage from './components/ai/AIPage';
 import AdminPage from './components/admin/AdminPage';
 import Layout from './components/layout/Layout';
-import ProfilePage from './components/auth/ProfilePage';
 import SettingsPage from './components/settings/SettingsPage';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -21,12 +20,13 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 
   if (!token) return <Navigate to="/login" replace />;
 
-  if (!user)
+  if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
+  }
 
   return <>{children}</>;
 }
@@ -34,8 +34,9 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuthStore();
 
-  if (user?.role !== 'admin')
+  if (user?.role !== 'admin') {
     return <Navigate to="/dashboard" replace />;
+  }
 
   return <>{children}</>;
 }
@@ -53,58 +54,55 @@ export default function App() {
 
   useEffect(() => {
     initialize();
-  }, []);
+  }, [initialize]);
 
   return (
     <ThemeProvider>
-      <BrowserRouter>
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: '#111827',
-              color: '#f1f5f9',
-              border: '1px solid rgba(255,255,255,0.1)',
-            },
-            success: {
-              iconTheme: { primary: '#10b981', secondary: '#111827' },
-            },
-            error: {
-              iconTheme: { primary: '#f43f5e', secondary: '#111827' },
-            },
-          }}
-        />
+      <LanguageProvider>
+        <BrowserRouter>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: '#111827',
+                color: '#f1f5f9',
+                border: '1px solid rgba(255,255,255,0.1)',
+              },
+              success: {
+                iconTheme: { primary: '#10b981', secondary: '#111827' },
+              },
+              error: {
+                iconTheme: { primary: '#f43f5e', secondary: '#111827' },
+              },
+            }}
+          />
 
-        <Routes>
-          {/* Public */}
-          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-          <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+          <Routes>
+            <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+            <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
 
-          {/* Private Layout */}
-          <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
-            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="tasks" element={<TasksPage />} />
+              <Route path="calendar" element={<CalendarPage />} />
+              <Route path="ai" element={<AIPage />} />
+              <Route path="settings" element={<SettingsPage />} />
 
-            <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="tasks" element={<TasksPage />} />
-            <Route path="calendar" element={<CalendarPage />} />
-            <Route path="ai" element={<AIPage />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="settings" element={<SettingsPage />} />
+              <Route
+                path="admin"
+                element={
+                  <AdminRoute>
+                    <AdminPage />
+                  </AdminRoute>
+                }
+              />
+            </Route>
 
-            <Route
-              path="admin"
-              element={
-                <AdminRoute>
-                  <AdminPage />
-                </AdminRoute>
-              }
-            />
-          </Route>
-
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </BrowserRouter>
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </LanguageProvider>
     </ThemeProvider>
   );
 }

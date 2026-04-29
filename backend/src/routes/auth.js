@@ -1,15 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const path = require('path');
 const { protect } = require('../middleware/auth');
 const { register, login, getMe, updateProfile, changePassword } = require('../controllers/authController');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => cb(null, `avatar-${Date.now()}${path.extname(file.originalname)}`)
+// ✅ Dùng memoryStorage — lưu file vào RAM dưới dạng buffer
+// Không ghi ra disk, convert sang Base64 lưu vào MongoDB
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Chỉ chấp nhận file ảnh'), false);
+    }
+  }
 });
-const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 router.post('/register', register);
 router.post('/login', login);

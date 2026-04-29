@@ -252,7 +252,6 @@ export default function RegisterPage() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
           style={{ textAlign: 'center', color: '#1e293b', fontSize: '0.72rem', marginTop: '1.5rem', letterSpacing: '0.05em' }}
         >
-          🔒 Bảo mật SSL · Dữ liệu được mã hóa
         </motion.p>
       </motion.div>
     </div>
