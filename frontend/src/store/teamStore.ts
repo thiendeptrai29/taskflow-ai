@@ -15,6 +15,7 @@ export interface TeamInvite {
   id: string;
   email: string;
   role: 'admin' | 'member';
+  status?: 'pending' | 'accepted' | 'declined'; // ✅ thêm status
   createdAt: string;
 }
 
@@ -66,21 +67,23 @@ export const useTeamStore = create<TeamStore>((set) => ({
   loading: false,
   error: null,
 
+  // ✅ FIX: đổi teamAPI.getTeams() → teamAPI.getAll()
   fetchTeams: async () => {
     set({ loading: true, error: null });
     try {
-      const res = await teamAPI.getTeams();
+      const res = await teamAPI.getAll();
       set({ teams: res.data.teams || [], loading: false });
     } catch (err: any) {
-      const msg = err.response?.data?.message || err.message || 'API Teams chưa sẵn sàng';
+      const msg = err.response?.data?.message || err.message || 'Không thể tải danh sách teams';
       set({ error: msg, teams: [], loading: false });
     }
   },
 
+  // ✅ FIX: đổi teamAPI.getTeam(id) → teamAPI.getById(id)
   fetchTeamDetail: async (id) => {
     set({ loading: true, error: null, currentTeam: null });
     try {
-      const res = await teamAPI.getTeam(id);
+      const res = await teamAPI.getById(id);
       set({ currentTeam: res.data.team, loading: false });
     } catch (err: any) {
       const msg = err.response?.data?.message || 'Không thể tải chi tiết team';
@@ -89,14 +92,15 @@ export const useTeamStore = create<TeamStore>((set) => ({
   },
 
   createTeam: async (data) => {
-    const res = await teamAPI.createTeam(data);
+    const res = await teamAPI.create(data as Record<string, unknown>);
     const newTeam = res.data.team;
     set(state => ({ teams: [newTeam, ...state.teams] }));
     return newTeam;
   },
 
+  // ✅ FIX: đổi teamAPI.updateTeam → teamAPI.update
   updateTeam: async (id, data) => {
-    const res = await teamAPI.updateTeam(id, data);
+    const res = await teamAPI.update(id, data as Record<string, unknown>);
     const updated = res.data.team;
     set(state => ({
       teams: state.teams.map(t => t.id === id ? { ...t, ...updated } : t),
@@ -106,13 +110,15 @@ export const useTeamStore = create<TeamStore>((set) => ({
     }));
   },
 
+  // ✅ FIX: đổi teamAPI.deleteTeam → teamAPI.delete
   deleteTeam: async (id) => {
-    await teamAPI.deleteTeam(id);
+    await teamAPI.delete(id);
     set(state => ({ teams: state.teams.filter(t => t.id !== id) }));
   },
 
+  // ✅ FIX: đổi teamAPI.inviteMember(teamId, { email, role }) → teamAPI.invite(teamId, email, role)
   inviteMember: async (teamId, email, role) => {
-    const res = await teamAPI.inviteMember(teamId, { email, role });
+    const res = await teamAPI.invite(teamId, email, role);
     const invite = res.data.invite;
     set(state => ({
       currentTeam: state.currentTeam
@@ -130,8 +136,9 @@ export const useTeamStore = create<TeamStore>((set) => ({
     }));
   },
 
+  // ✅ FIX: đổi teamAPI.updateMemberRole(teamId, memberId, { role }) → teamAPI.updateMemberRole(teamId, memberId, role)
   updateMemberRole: async (teamId, memberId, role) => {
-    await teamAPI.updateMemberRole(teamId, memberId, { role });
+    await teamAPI.updateMemberRole(teamId, memberId, role);
     set(state => ({
       currentTeam: state.currentTeam
         ? {

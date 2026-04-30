@@ -77,26 +77,40 @@ export const adminAPI = {
   getStats: () => api.get('/admin/stats'),
 };
 
-// Teams
+// ============ Team API ============
 export const teamAPI = {
-  getTeams: () => api.get('/teams'),
-  getTeam: (id: string) => api.get(`/teams/${id}`),
-  createTeam: (data: any) => api.post('/teams', data),
-  updateTeam: (id: string, data: any) => api.patch(`/teams/${id}`, data),
-  deleteTeam: (id: string) => api.delete(`/teams/${id}`),
-
-  getMembers: (id: string) => api.get(`/teams/${id}/members`),
-  inviteMember: (id: string, data: { email: string; role: string }) =>
-    api.post(`/teams/${id}/invite`, data),
-  cancelInvite: (teamId: string, inviteId: string) =>
-    api.delete(`/teams/${teamId}/invites/${inviteId}`),
-  updateMemberRole: (teamId: string, memberId: string, data: { role: string }) =>
-    api.patch(`/teams/${teamId}/members/${memberId}/role`, data),
-  removeMember: (teamId: string, memberId: string) =>
-    api.delete(`/teams/${teamId}/members/${memberId}`),
-
-  getTeamTasks: (id: string, params?: any) => api.get(`/teams/${id}/tasks`, { params }),
-  createTeamTask: (id: string, data: any) => api.post(`/teams/${id}/tasks`, data),
+  getAll: () => api.get('/teams'),
+  create: (data: Record<string, unknown>) => api.post('/teams', data),
+  getById: (id: string) => api.get(`/teams/${id}`),
+  update: (id: string, data: Record<string, unknown>) => api.patch(`/teams/${id}`, data),
+  delete: (id: string) => api.delete(`/teams/${id}`),
+ 
+  // Members
+  invite: (id: string, email: string, role: string) =>
+    api.post(`/teams/${id}/invite`, { email, role }),
+  cancelInvite: (id: string, inviteId: string) =>
+    api.delete(`/teams/${id}/invites/${inviteId}`),
+ 
+  // ✅ Accept / Decline invite
+  acceptInvite: (teamId: string, inviteId: string) =>
+    api.post(`/teams/${teamId}/invites/${inviteId}/accept`),
+  declineInvite: (teamId: string, inviteId: string) =>
+    api.post(`/teams/${teamId}/invites/${inviteId}/decline`),
+ 
+  // ✅ Lấy lời mời của tôi
+  getMyInvites: () => api.get('/teams/me/invites'),
+ 
+  // Member role
+  updateMemberRole: (id: string, memberId: string, role: string) =>
+    api.patch(`/teams/${id}/members/${memberId}/role`, { role }),
+  removeMember: (id: string, memberId: string) =>
+    api.delete(`/teams/${id}/members/${memberId}`),
+ 
+  // Tasks
+  getTasks: (id: string, params?: Record<string, string>) =>
+    api.get(`/teams/${id}/tasks`, { params }),
+  createTask: (id: string, data: Record<string, unknown>) =>
+    api.post(`/teams/${id}/tasks`, data),
 };
 
 export default api;

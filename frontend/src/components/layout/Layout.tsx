@@ -3,12 +3,13 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, CheckSquare, Calendar, Sparkles,
-  Settings, LogOut, Shield, Bell, ChevronLeft, ChevronRight
+  Settings, LogOut, Shield, Bell, ChevronLeft, ChevronRight, Users
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useLanguage } from '../../context/LanguageContext';
 import NotificationPanel from './NotificationPanel';
-import { Users } from 'lucide-react';
+import InviteNotificationBanner from '../team/InviteNotificationBanner'; // ✅ Thêm
+
 export default function Layout() {
   const [collapsed, setCollapsed] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -32,12 +33,9 @@ export default function Layout() {
 
   useEffect(() => {
     const saved = localStorage.getItem('settings');
-
     if (saved) {
       const data = JSON.parse(saved);
-
       document.documentElement.classList.toggle('dark', data.darkMode);
-
       if (data.color) {
         document.documentElement.style.setProperty('--primary', data.color);
       }
@@ -46,6 +44,11 @@ export default function Layout() {
 
   return (
     <div className="flex h-screen overflow-hidden">
+
+      {/* ✅ Banner lời mời team — hiển thị toàn app */}
+      <InviteNotificationBanner />
+
+      {/* Sidebar */}
       <motion.aside
         animate={{ width: collapsed ? 72 : 240 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
@@ -61,18 +64,9 @@ export default function Layout() {
 
           <AnimatePresence>
             {!collapsed && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <p className="!text-[#f8fafc] font-bold text-sm leading-tight">
-                  TaskFlow
-                </p>
-                <p
-                  className="text-xs font-semibold"
-                  style={{ color: 'var(--primary)' }}
-                >
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <p className="!text-[#f8fafc] font-bold text-sm leading-tight">TaskFlow</p>
+                <p className="text-xs font-semibold" style={{ color: 'var(--primary)' }}>
                   {t('layout.aiPowered')}
                 </p>
               </motion.div>
@@ -97,13 +91,10 @@ export default function Layout() {
               }
             >
               <Icon size={18} className="flex-shrink-0 !text-current" />
-
               <AnimatePresence>
                 {!collapsed && (
                   <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                     className="whitespace-nowrap !text-current"
                   >
                     {label}
@@ -125,15 +116,9 @@ export default function Layout() {
               }
             >
               <Shield size={18} className="flex-shrink-0 !text-current" />
-
               <AnimatePresence>
                 {!collapsed && (
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="!text-current"
-                  >
+                  <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="!text-current">
                     {t('layout.admin')}
                   </motion.span>
                 )}
@@ -143,42 +128,22 @@ export default function Layout() {
         </nav>
 
         <div className="p-3 border-t border-white/10">
-          <div
-            className={`flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-white/10 transition-all mb-1 ${
-              collapsed ? 'justify-center' : ''
-            }`}
-          >
+          <div className={`flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-white/10 transition-all mb-1 ${collapsed ? 'justify-center' : ''}`}>
             <div
-              className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+              className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
               style={{ backgroundColor: 'var(--primary)' }}
             >
               {user?.avatar ? (
-                <img
-                  src={user.avatar}
-                  className="w-8 h-8 rounded-full object-cover"
-                  alt=""
-                />
+                <img src={user.avatar} className="w-8 h-8 rounded-full object-cover" alt="" />
               ) : (
-                <span className="!text-white text-xs font-bold">
-                  {user?.name?.[0]?.toUpperCase()}
-                </span>
+                <span className="!text-white text-xs font-bold">{user?.name?.[0]?.toUpperCase()}</span>
               )}
             </div>
-
             <AnimatePresence>
               {!collapsed && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex-1 min-w-0"
-                >
-                  <p className="!text-[#f8fafc] text-xs font-semibold truncate">
-                    {user?.name}
-                  </p>
-                  <p className="!text-[#cbd5e1] text-xs truncate">
-                    {user?.email}
-                  </p>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 min-w-0">
+                  <p className="!text-[#f8fafc] text-xs font-semibold truncate">{user?.name}</p>
+                  <p className="!text-[#cbd5e1] text-xs truncate">{user?.email}</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -186,9 +151,7 @@ export default function Layout() {
 
           <button
             onClick={handleLogout}
-            className={`flex items-center gap-3 px-3 py-2 w-full rounded-xl !text-[#cbd5e1] hover:!text-rose-300 hover:bg-rose-500/10 transition-all text-sm font-medium ${
-              collapsed ? 'justify-center' : ''
-            }`}
+            className={`flex items-center gap-3 px-3 py-2 w-full rounded-xl !text-[#cbd5e1] hover:!text-rose-300 hover:bg-rose-500/10 transition-all text-sm font-medium ${collapsed ? 'justify-center' : ''}`}
           >
             <LogOut size={16} className="flex-shrink-0 !text-current" />
             {!collapsed && <span className="!text-current">{t('layout.logout')}</span>}
@@ -203,6 +166,7 @@ export default function Layout() {
         </button>
       </motion.aside>
 
+      {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="h-14 flex items-center justify-end px-6 border-b border-white/10 bg-dark-800/50 backdrop-blur-sm flex-shrink-0">
           <button
