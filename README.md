@@ -1,87 +1,217 @@
 # 🚀 TaskFlow AI — Ứng dụng Quản lý Công việc Thông minh
 
-> Ứng dụng quản lý công việc cá nhân tích hợp AI, xây dựng với React + Node.js + MongoDB + OpenAI
+> Ứng dụng quản lý công việc cá nhân tích hợp AI, xây dựng với React + TypeScript + Node.js + MongoDB + OpenAI
+
+---
+
+## 📁 Cấu trúc Thư mục
+
+```
+taskflow-ai/
+├── backend/
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── .env                          # Environment variables
+│   ├── src/
+│   │   ├── server.js                 # Entry point
+│   │   ├── config/
+│   │   │   └── database.js          # MongoDB config
+│   │   ├── controllers/              # Business logic
+│   │   │   ├── adminController.js
+│   │   │   ├── aiController.js      # AI features
+│   │   │   ├── authController.js    # Auth logic
+│   │   │   ├── Chatcontroller.js    # Chat/messages
+│   │   │   ├── notificationController.js
+│   │   │   ├── statsController.js
+│   │   │   ├── taskController.js
+│   │   │   └── teamController.js    # Team management
+│   │   ├── middleware/
+│   │   │   └── auth.js              # JWT verification
+│   │   ├── models/                   # Database schemas
+│   │   │   ├── User.js
+│   │   │   ├── Task.js
+│   │   │   ├── Chathistory.js
+│   │   │   ├── Notification.js
+│   │   │   └── Team.js              # Team schema
+│   │   └── routes/                   # API endpoints
+│   │       ├── admin.js
+│   │       ├── ai.js
+│   │       ├── auth.js
+│   │       ├── chat.js
+│   │       ├── notifications.js
+│   │       ├── stats.js
+│   │       ├── tasks.js
+│   │       └── teams.js             # Team endpoints
+│   ├── uploads/                      # File uploads (created by app)
+│
+├── frontend/
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── vite.config.ts
+│   ├── tailwind.config.js
+│   ├── postcss.config.js
+│   ├── index.html
+│   ├── src/
+│   │   ├── main.tsx                 # Entry point
+│   │   ├── App.tsx                  # Main component
+│   │   ├── index.css
+│   │   ├── components/               # Reusable components
+│   │   │   ├── admin/
+│   │   │   │   └── AdminPage.tsx
+│   │   │   ├── ai/
+│   │   │   │   └── AIPage.tsx
+│   │   │   ├── auth/
+│   │   │   │   ├── LoginPage.tsx
+│   │   │   │   └── RegisterPage.tsx
+│   │   │   ├── dashboard/
+│   │   │   │   └── DashboardPage.tsx
+│   │   │   ├── layout/
+│   │   │   │   ├── Layout.tsx
+│   │   │   │   └── NotificationPanel.tsx
+│   │   │   ├── settings/
+│   │   │   │   └── SettingsPage.tsx
+│   │   │   ├── tasks/
+│   │   │   │   ├── CalendarPage.tsx
+│   │   │   │   ├── TaskCard.tsx
+│   │   │   │   ├── TaskModal.tsx
+│   │   │   │   └── TasksPage.tsx
+│   │   │   └── team/
+│   │   │       ├── InviteMemberModal.tsx
+│   │   │       ├── TeamCard.tsx
+│   │   │       ├── TeamDetailPage.tsx
+│   │   │       ├── TeamModal.tsx
+│   │   │       └── TeamPage.tsx
+│   │   ├── context/                  # React Context
+│   │   │   ├── LanguageContext.tsx  # i18n
+│   │   │   └── ThemeContext.tsx      # Dark/Light mode
+│   │   ├── i18n/
+│   │   │   └── translations.ts       # Multi-language
+│   │   ├── services/
+│   │   │   └── api.ts                # API calls (Axios)
+│   │   ├── store/                    # Zustand stores
+│   │   │   ├── authStore.ts
+│   │   │   ├── taskStore.ts
+│   │   │   └── teamStore.ts
+│   │   └── types/
+│   │       └── index.ts              # TypeScript types
+│   └── public/                       # Static assets
+│
+├── package.json                      # Root package.json
+├── setup.js                          # Setup script
+└── README.md                         # This file
+```
 
 ---
 
 ## ✨ Tính năng
 
-### 👤 Người dùng (US-01 → US-20)
+### 👤 Quản lý Người dùng
 - **Đăng ký / Đăng nhập** với JWT Authentication
-- **Tạo, sửa, xóa task** với đầy đủ thông tin (tiêu đề, mô tả, deadline, ưu tiên, subtasks, tags)
+- **Dark / Light mode** — chuyển đổi theme toàn app
+- **Đa ngôn ngữ** (i18n) — Tiếng Việt / Tiếng Anh
+- **Hồ sơ cá nhân** & Cài đặt
+
+### 📋 Quản lý Task
+- **Tạo, sửa, xóa task** với đầy đủ thông tin
 - **Toggle hoàn thành** task bằng 1 click
 - **Lọc & tìm kiếm** theo trạng thái, ưu tiên, từ khóa
 - **Calendar view** — xem task theo lịch tháng
-- **Thống kê Dashboard** — biểu đồ AreaChart, PieChart
-- **Thông báo** deadline, nhắc nhở
-- **Upload file đính kèm** vào task
+- **Phân loại** theo tags & trạng thái (Pending, In Progress, Completed, Cancelled)
+- **Ưu tiên** (High, Medium, Low)
 - **Subtasks** — quản lý công việc con
-- **Dark / Light mode** — chuyển đổi theme toàn app
 
-### 🤖 AI Features (US-16 → US-20)
+### 📊 Dashboard & Thống kê
+- **Biểu đồ thống kê** — AreaChart, PieChart (Recharts)
+- **Phân tích năng suất** — Điểm số & nhận xét
+- **Thông báo deadline** — Nhắc nhở thông minh
+
+### 🤖 AI Features
 | Tính năng | Mô tả |
 |-----------|-------|
 | **AI Chat Assistant** | Chatbot hỏi đáp, tư vấn quản lý task |
 | **Gợi ý ưu tiên** | AI phân tích và xếp hạng task theo độ khẩn |
-| **Lịch thông minh** | AI tự động lên lịch làm việc tối ưu theo giờ |
+| **Lên lịch thông minh** | AI tự động lên lịch làm việc tối ưu |
 | **Phân tích năng suất** | Điểm số + nhận xét + gợi ý cải thiện |
-| **Nhắc nhở thông minh** | AI tạo thông điệp nhắc nhở cá nhân hóa |
-| **Tạo task từ text** | Nhập văn bản tự nhiên → AI tự phân loại & điền form |
+| **Nhắc nhở cá nhân hóa** | AI tạo thông điệp nhắc nhở theo context |
+| **Tạo task từ text** | Nhập văn bản → AI phân loại & điền form |
 | **Voice input** | Nhận giọng nói tiếng Việt (Web Speech API) |
 
-### 🛡️ Admin (US-21 → US-23)
+### 👥 Quản lý Team (trong phát triển)
+- Tạo & quản lý team
+- Mời thành viên
+- Chia sẻ task trong team
+
+### 🛡️ Admin Dashboard
 - Xem danh sách tất cả người dùng
 - Khóa / Mở khóa tài khoản
-- Dashboard thống kê hệ thống
+- Thống kê hệ thống
+- Quản lý người dùng
 
 ---
 
-## 🛠 Công nghệ
+## 🛠 Công nghệ Stack
 
 | Layer | Stack |
 |-------|-------|
-| Frontend | React 18 + TypeScript + Vite |
-| Styling | Tailwind CSS + Framer Motion |
-| State | Zustand |
-| HTTP | Axios |
-| Charts | Recharts |
-| Backend | Node.js + Express.js |
-| Auth | JWT + bcryptjs |
-| Database | MongoDB + Mongoose |
-| AI | OpenAI GPT-3.5-turbo |
-| Upload | Multer |
+| **Frontend** | React 18 + TypeScript + Vite |
+| **Styling** | Tailwind CSS + PostCSS |
+| **State Management** | Zustand |
+| **HTTP Client** | Axios |
+| **Charts** | Recharts |
+| **Backend** | Node.js + Express.js |
+| **Authentication** | JWT + bcryptjs |
+| **Database** | MongoDB + Mongoose |
+| **AI Integration** | OpenAI GPT-3.5-turbo |
+| **File Upload** | Multer |
+| **Utilities** | Framer Motion, React DatePicker |
 
 ---
 
 ## ⚡ Cài đặt & Chạy
 
 ### Yêu cầu
-- Node.js >= 18
-- MongoDB (local hoặc Atlas)
-- OpenAI API Key
+- **Node.js** >= 18
+- **npm** hoặc **yarn**
+- **MongoDB** (local hoặc Atlas)
+- **OpenAI API Key**
 
 ---
 
-### 1. Clone & Cài đặt Backend
+### 1. Clone Repository
+
+```bash
+git clone <repository-url>
+cd taskflow-ai
+```
+
+---
+
+### 2. Backend Setup
 
 ```bash
 cd backend
 npm install
 
+# Tạo file .env
+# Cần: MONGODB_URI, JWT_SECRET, OPENAI_API_KEY, PORT
+
 # Tạo thư mục uploads
 mkdir uploads
 
-# Chạy backend
+# Chạy backend (port 5000)
 npm run dev
 ```
 
 ---
 
-### 2. Cài đặt Frontend
+### 3. Frontend Setup
 
 ```bash
 cd frontend
 npm install
+
+# Cấu hình API endpoint trong services/api.ts
+# Chạy frontend (port 5173)
 npm run dev
 ```
 
@@ -89,12 +219,12 @@ Mở trình duyệt: **http://localhost:5173**
 
 ---
 
-### 3. Tạo tài khoản Admin (tùy chọn)
+### 4. Tạo Admin Account (tùy chọn)
 
-Sau khi đăng ký tài khoản, vào MongoDB và đổi role:
+Sau khi đăng ký tài khoản, vào MongoDB và cập nhật:
 
 ```javascript
-// MongoDB Shell hoặc Compass
+// MongoDB Shell
 db.users.updateOne(
   { email: "your@email.com" },
   { $set: { role: "admin" } }
@@ -103,80 +233,7 @@ db.users.updateOne(
 
 ---
 
-## 📁 Cấu trúc thư mục
-
-taskflow-ai/
-├── backend/
-│   ├── src/
-│   │   ├── config/
-│   │   │   └── database.js
-│   │   ├── controllers/
-│   │   │   ├── authController.js
-│   │   │   ├── taskController.js
-│   │   │   ├── aiController.js
-│   │   │   ├── statsController.js
-│   │   │   ├── adminController.js
-│   │   │   └── notificationController.js
-│   │   ├── models/
-│   │   │   ├── User.js
-│   │   │   ├── Task.js
-│   │   │   └── Notification.js
-│   │   ├── middleware/
-│   │   │   └── auth.js
-│   │   ├── routes/
-│   │   │   ├── auth.js
-│   │   │   ├── tasks.js
-│   │   │   ├── ai.js
-│   │   │   ├── admin.js
-│   │   │   ├── notifications.js
-│   │   │   └── stats.js
-│   │   └── server.js
-│   ├── uploads/
-│   ├── package.json
-│   └── .env.example
-│
-└── frontend/
-    ├── src/
-    │   ├── components/
-    │   │   ├── auth/
-    │   │   │   ├── LoginPage.tsx        # ✅ Cập nhật UI dark
-    │   │   │   └── RegisterPage.tsx     # ✅ Cập nhật UI dark
-    │   │   │   # 🗑️ ProfilePage.tsx đã xóa → merge vào Settings
-    │   │   ├── dashboard/
-    │   │   │   └── DashboardPage.tsx
-    │   │   ├── tasks/
-    │   │   │   ├── TasksPage.tsx
-    │   │   │   ├── TaskCard.tsx
-    │   │   │   ├── TaskModal.tsx
-    │   │   │   └── CalendarPage.tsx
-    │   │   ├── ai/
-    │   │   │   └── AIPage.tsx
-    │   │   ├── admin/
-    │   │   │   └── AdminPage.tsx
-    │   │   ├── settings/
-    │   │   │   └── SettingsPage.tsx     # ✅ Merge Profile + ThemeContext
-    │   │   └── layout/
-    │   │       ├── Layout.tsx          
-    │   │       └── NotificationPanel.tsx
-    │   ├── context/
-    │   │   └── ThemeContext.tsx         # 🆕 Global dark/light mode
-    │   ├── services/
-    │   │   └── api.ts
-    │   ├── store/
-    │   │   ├── authStore.ts
-    │   │   └── taskStore.ts
-    │   ├── types/
-    │   │   └── index.ts
-    │   ├── App.tsx                      # ✅ Bỏ route /profile + ThemeProvider
-    │   ├── main.tsx
-    │   └── index.css                    # ✅ Thêm pastel light mode
-    ├── package.json
-    ├── vite.config.ts
-    └── tailwind.config.js
-
----
-
-## 🔌 API Endpoints
+## � API Endpoints
 
 ### Auth
 | Method | Endpoint | Mô tả |
@@ -208,12 +265,16 @@ taskflow-ai/
 | POST | `/api/ai/create-task` | Tạo task từ text |
 | GET | `/api/ai/smart-reminders` | Nhắc nhở thông minh |
 
-### Stats & Notifications & Admin
+### Stats & Notifications
 | Method | Endpoint | Mô tả |
 |--------|----------|-------|
 | GET | `/api/stats` | Thống kê dashboard |
 | GET | `/api/notifications` | Lấy thông báo |
 | PATCH | `/api/notifications/mark-read` | Đọc tất cả |
+
+### Admin
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
 | GET | `/api/admin/users` | Danh sách users (admin) |
 | PATCH | `/api/admin/users/:id/toggle` | Khóa/Mở user |
 | GET | `/api/admin/stats` | Thống kê admin |
@@ -222,24 +283,47 @@ taskflow-ai/
 
 ## 🔑 Biến môi trường
 
+### Backend (.env)
+
 | Biến | Ví dụ | Bắt buộc |
 |------|-------|----------|
 | `PORT` | `5000` | ❌ |
 | `MONGODB_URI` | `mongodb://localhost:27017/taskflow_ai` | ✅ |
-| `JWT_SECRET` | `your_secret_key` | ✅ |
+| `JWT_SECRET` | `your_secret_key_here` | ✅ |
 | `JWT_EXPIRES_IN` | `7d` | ❌ |
 | `OPENAI_API_KEY` | `sk-...` | ✅ (AI features) |
 | `CLIENT_URL` | `http://localhost:5173` | ❌ |
+| `NODE_ENV` | `development` | ❌ |
+
+### Frontend (.env)
+
+```env
+VITE_API_BASE_URL=http://localhost:5000
+```
 
 ---
 
 ## 📝 Ghi chú
 
 - **AI features** yêu cầu `OPENAI_API_KEY` hợp lệ. Nếu không có, các tính năng AI sẽ trả về lỗi nhưng không ảnh hưởng các tính năng khác.
-- **Voice input** yêu cầu trình duyệt hỗ trợ Web Speech API (Chrome, Edge).
-- File upload tối đa 10MB cho task attachments, 5MB cho avatar.
-- MongoDB có thể dùng **MongoDB Atlas** miễn phí: https://cloud.mongodb.com
-- **Dark/Light mode** lưu vào `localStorage`, mặc định là dark mode.
+- **Voice input** yêu cầu trình duyệt hỗ trợ Web Speech API (Chrome, Edge, Firefox).
+- File upload tối đa: 10MB cho task attachments, 5MB cho avatar.
+- **MongoDB**: Dùng MongoDB Atlas (miễn phí): https://cloud.mongodb.com
+- **Dark/Light mode**: Lưu vào `localStorage`, mặc định là dark mode.
+- **Đa ngôn ngữ**: i18n context với tiếng Việt/Anh, có thể mở rộng.
+
+---
+
+## 🚀 Phát triển tiếp theo
+
+- [ ] WebSocket cho real-time chat
+- [ ] Notification push trên mobile
+- [ ] Export task thành PDF/Excel
+- [ ] Integration với Google Calendar
+- [ ] Voice commands
+- [ ] Mobile app (React Native)
+- [ ] Team collaboration features
+- [ ] More AI capabilities (GPT-4, Claude)
 
 ---
 

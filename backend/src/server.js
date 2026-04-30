@@ -30,7 +30,8 @@ app.use('/api/ai', require('./routes/ai'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/stats', require('./routes/stats'));
-app.use('/api/chat', require('./routes/chat')); // ✅ Thêm dòng này
+app.use('/api/chat', require('./routes/chat'));
+app.use('/api/teams', require('./routes/teams')); // ✅ Teams
 
 // Health check
 app.get('/api/health', (req, res) => {

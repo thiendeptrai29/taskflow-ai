@@ -6,6 +6,17 @@ const taskSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  // ✅ Team task support
+  team: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Team',
+    default: null
+  },
+  assignee: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
   title: {
     type: String,
     required: [true, 'Task title is required'],
@@ -49,11 +60,11 @@ const taskSchema = new mongoose.Schema({
     default: 0
   },
   estimatedDuration: {
-    type: Number, // in minutes
+    type: Number,
     default: 30
   },
   actualDuration: {
-    type: Number // in minutes
+    type: Number
   },
   subtasks: [{
     title: String,
@@ -83,6 +94,7 @@ const taskSchema = new mongoose.Schema({
 taskSchema.index({ user: 1, status: 1 });
 taskSchema.index({ user: 1, deadline: 1 });
 taskSchema.index({ user: 1, priority: 1 });
+taskSchema.index({ team: 1, status: 1 }); // ✅ Team index
 
 // Virtual for overdue check
 taskSchema.virtual('isOverdue').get(function () {

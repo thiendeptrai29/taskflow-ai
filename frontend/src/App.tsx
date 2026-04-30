@@ -14,6 +14,8 @@ import AIPage from './components/ai/AIPage';
 import AdminPage from './components/admin/AdminPage';
 import Layout from './components/layout/Layout';
 import SettingsPage from './components/settings/SettingsPage';
+import TeamPage from './components/team/TeamPage';
+import TeamDetailPage from './components/team/TeamDetailPage';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, token } = useAuthStore();
@@ -88,6 +90,8 @@ export default function App() {
               <Route path="calendar" element={<CalendarPage />} />
               <Route path="ai" element={<AIPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="teams" element={<TeamPage />} />
+              <Route path="teams/:id" element={<TeamDetailPage />} />
 
               <Route
                 path="admin"

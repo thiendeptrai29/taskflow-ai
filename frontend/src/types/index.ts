@@ -77,4 +77,26 @@ export interface TaskFilters {
   endDate?: string;
   sort: string;
 }
+export interface Team {
+  id: string;
+  name: string;
+  description?: string;
+  color: string;
+  avatar?: string;
+  memberCount: number;
+  openTaskCount: number;
+  myRole: 'owner' | 'admin' | 'member';
+  createdAt: string;
+  createdBy: string;
+}
+ 
+export interface TeamMember {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  role: 'owner' | 'admin' | 'member';
+  status: 'active' | 'pending';
+  joinedAt: string;
+}
 

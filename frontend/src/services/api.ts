@@ -77,4 +77,26 @@ export const adminAPI = {
   getStats: () => api.get('/admin/stats'),
 };
 
+// Teams
+export const teamAPI = {
+  getTeams: () => api.get('/teams'),
+  getTeam: (id: string) => api.get(`/teams/${id}`),
+  createTeam: (data: any) => api.post('/teams', data),
+  updateTeam: (id: string, data: any) => api.patch(`/teams/${id}`, data),
+  deleteTeam: (id: string) => api.delete(`/teams/${id}`),
+
+  getMembers: (id: string) => api.get(`/teams/${id}/members`),
+  inviteMember: (id: string, data: { email: string; role: string }) =>
+    api.post(`/teams/${id}/invite`, data),
+  cancelInvite: (teamId: string, inviteId: string) =>
+    api.delete(`/teams/${teamId}/invites/${inviteId}`),
+  updateMemberRole: (teamId: string, memberId: string, data: { role: string }) =>
+    api.patch(`/teams/${teamId}/members/${memberId}/role`, data),
+  removeMember: (teamId: string, memberId: string) =>
+    api.delete(`/teams/${teamId}/members/${memberId}`),
+
+  getTeamTasks: (id: string, params?: any) => api.get(`/teams/${id}/tasks`, { params }),
+  createTeamTask: (id: string, data: any) => api.post(`/teams/${id}/tasks`, data),
+};
+
 export default api;

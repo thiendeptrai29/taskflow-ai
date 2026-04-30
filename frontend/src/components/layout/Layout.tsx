@@ -8,7 +8,7 @@ import {
 import { useAuthStore } from '../../store/authStore';
 import { useLanguage } from '../../context/LanguageContext';
 import NotificationPanel from './NotificationPanel';
-
+import { Users } from 'lucide-react';
 export default function Layout() {
   const [collapsed, setCollapsed] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -21,6 +21,7 @@ export default function Layout() {
     { path: '/tasks', icon: CheckSquare, label: t('layout.tasks') },
     { path: '/calendar', icon: Calendar, label: t('layout.calendar') },
     { path: '/ai', icon: Sparkles, label: t('layout.ai') },
+    { path: '/teams', icon: Users, label: 'Teams' },
     { path: '/settings', icon: Settings, label: t('layout.settings') },
   ];
 
