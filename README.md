@@ -1,6 +1,6 @@
 # 🚀 TaskFlow AI — Ứng dụng Quản lý Công việc Thông minh
 
-> Ứng dụng quản lý công việc cá nhân tích hợp AI, xây dựng với React + TypeScript + Node.js + MongoDB + OpenAI
+> Ứng dụng quản lý công việc cá nhân tích hợp AI, xây dựng với React + TypeScript + Node.js + MongoDB + Groq
 
 ---
 
@@ -161,7 +161,7 @@ taskflow-ai/
 | **Backend** | Node.js + Express.js |
 | **Authentication** | JWT + bcryptjs |
 | **Database** | MongoDB + Mongoose |
-| **AI Integration** | OpenAI GPT-3.5-turbo |
+| **AI Integration** | Groq API |
 | **File Upload** | Multer |
 | **Utilities** | Framer Motion, React DatePicker |
 
@@ -173,7 +173,7 @@ taskflow-ai/
 - **Node.js** >= 18
 - **npm** hoặc **yarn**
 - **MongoDB** (local hoặc Atlas)
-- **OpenAI API Key**
+- **Groq API Key**
 
 ---
 
@@ -193,7 +193,7 @@ cd backend
 npm install
 
 # Tạo file .env
-# Cần: MONGODB_URI, JWT_SECRET, OPENAI_API_KEY, PORT
+# Cần: MONGODB_URI, JWT_SECRET, GROK_API_KEY, PORT
 
 # Tạo thư mục uploads
 mkdir uploads
@@ -291,7 +291,7 @@ db.users.updateOne(
 | `MONGODB_URI` | `mongodb://localhost:27017/taskflow_ai` | ✅ |
 | `JWT_SECRET` | `your_secret_key_here` | ✅ |
 | `JWT_EXPIRES_IN` | `7d` | ❌ |
-| `OPENAI_API_KEY` | `sk-...` | ✅ (AI features) |
+| `GROK_API_KEY` | `groq-...` | ✅ (AI features) |
 | `CLIENT_URL` | `http://localhost:5173` | ❌ |
 | `NODE_ENV` | `development` | ❌ |
 
@@ -305,7 +305,7 @@ VITE_API_BASE_URL=http://localhost:5000
 
 ## 📝 Ghi chú
 
-- **AI features** yêu cầu `OPENAI_API_KEY` hợp lệ. Nếu không có, các tính năng AI sẽ trả về lỗi nhưng không ảnh hưởng các tính năng khác.
+- **AI features** yêu cầu `GROK_API_KEY` hợp lệ. Nếu không có, các tính năng AI sẽ trả về lỗi nhưng không ảnh hưởng các tính năng khác.
 - **Voice input** yêu cầu trình duyệt hỗ trợ Web Speech API (Chrome, Edge, Firefox).
 - File upload tối đa: 10MB cho task attachments, 5MB cho avatar.
 - **MongoDB**: Dùng MongoDB Atlas (miễn phí): https://cloud.mongodb.com
