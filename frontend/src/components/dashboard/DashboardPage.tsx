@@ -13,6 +13,7 @@ import { statsAPI, taskAPI } from '../../services/api';
 import { Stats, Task } from '../../types';
 import { useAuthStore } from '../../store/authStore';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import { format } from 'date-fns';
 import { vi, enUS } from 'date-fns/locale';
 
@@ -38,6 +39,7 @@ const StatCard = ({ icon: Icon, label, value, color, sub }: any) => (
 export default function DashboardPage() {
   const { user } = useAuthStore();
   const { language, t } = useLanguage();
+  const { dark } = useTheme();
 
   const [stats, setStats] = useState<Stats | null>(null);
   const [upcomingTasks, setUpcomingTasks] = useState<Task[]>([]);
@@ -45,6 +47,18 @@ export default function DashboardPage() {
   const [refreshing, setRefreshing] = useState(false);
 
   const dateLocale = language === 'vi' ? vi : enUS;
+
+  const tooltipStyle = {
+    background: dark ? '#111827' : '#ffffff',
+    border: dark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(15,23,42,0.12)',
+    borderRadius: '8px',
+    fontSize: '12px',
+    color: dark ? '#f1f5f9' : '#0f172a',
+  };
+
+  const tooltipTextStyle = {
+    color: dark ? '#f1f5f9' : '#0f172a',
+  };
 
   const priorityLabel: Record<string, string> = {
     high: t('dashboard.priorityHigh'),
@@ -57,6 +71,12 @@ export default function DashboardPage() {
     medium: t('dashboard.priorityMediumShort'),
     low: t('dashboard.priorityLow'),
   };
+
+  const priorityChartData = (stats?.priorityDistribution ?? []).map(item => ({
+    key: item._id,
+    name: priorityLabel[item._id] || item._id,
+    count: item.count,
+  }));
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -124,7 +144,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">
@@ -154,7 +173,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           icon={Target}
@@ -183,9 +201,7 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Charts row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Area chart */}
         <div className="lg:col-span-2 glass rounded-2xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-white text-sm flex items-center gap-2">
@@ -209,24 +225,20 @@ export default function DashboardPage() {
 
               <XAxis
                 dataKey="date"
-                tick={{ fill: '#475569', fontSize: 11 }}
+                tick={{ fill: dark ? '#475569' : '#64748b', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fill: '#475569', fontSize: 11 }}
+                tick={{ fill: dark ? '#475569' : '#64748b', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
               <Tooltip
-                contentStyle={{
-                  background: '#111827',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px',
-                  color: '#f1f5f9',
-                  fontSize: '12px',
-                }}
-                cursor={{ stroke: 'rgba(255,255,255,0.05)' }}
+                contentStyle={tooltipStyle}
+                itemStyle={tooltipTextStyle}
+                labelStyle={tooltipTextStyle}
+                cursor={{ stroke: dark ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.08)' }}
               />
               <Area
                 type="monotone"
@@ -248,52 +260,48 @@ export default function DashboardPage() {
           </ResponsiveContainer>
         </div>
 
-        {/* Pie chart */}
         <div className="glass rounded-2xl p-5">
           <h3 className="font-semibold text-white text-sm mb-4 flex items-center gap-2">
             <Zap size={16} className="text-amber-400" />
             {t('dashboard.byPriority')}
           </h3>
 
-          {stats?.priorityDistribution && stats.priorityDistribution.length > 0 ? (
+          {priorityChartData.length > 0 ? (
             <>
               <ResponsiveContainer width="100%" height={140}>
                 <PieChart>
                   <Pie
-                    data={stats.priorityDistribution}
+                    data={priorityChartData}
                     dataKey="count"
-                    nameKey="_id"
+                    nameKey="name"
                     cx="50%"
                     cy="50%"
                     innerRadius={40}
                     outerRadius={65}
                   >
-                    {stats.priorityDistribution.map(entry => (
-                      <Cell key={entry._id} fill={PRIORITY_COLORS[entry._id] || '#475569'} />
+                    {priorityChartData.map(entry => (
+                      <Cell key={entry.key} fill={PRIORITY_COLORS[entry.key] || '#475569'} />
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{
-                      background: '#111827',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '8px',
-                      fontSize: '12px',
-                      color: '#f1f5f9',
-                    }}
+                    formatter={(value, name) => [`${value}`, name]}
+                    contentStyle={tooltipStyle}
+                    itemStyle={tooltipTextStyle}
+                    labelStyle={tooltipTextStyle}
                   />
                 </PieChart>
               </ResponsiveContainer>
 
               <div className="space-y-1.5 mt-2">
-                {stats.priorityDistribution.map(item => (
-                  <div key={item._id} className="flex items-center justify-between text-xs">
+                {priorityChartData.map(item => (
+                  <div key={item.key} className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
                       <span
                         className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                        style={{ background: PRIORITY_COLORS[item._id] }}
+                        style={{ background: PRIORITY_COLORS[item.key] }}
                       />
                       <span className="text-slate-400">
-                        {priorityLabel[item._id] || item._id}
+                        {item.name}
                       </span>
                     </div>
                     <span className="font-semibold text-slate-200">{item.count}</span>
@@ -309,7 +317,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Upcoming tasks */}
       <div className="glass rounded-2xl p-5">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-white text-sm flex items-center gap-2">
@@ -365,7 +372,6 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* AI Banner */}
       <Link to="/ai">
         <motion.div
           whileHover={{ scale: 1.01 }}

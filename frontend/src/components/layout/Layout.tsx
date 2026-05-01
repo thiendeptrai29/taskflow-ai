@@ -128,26 +128,42 @@ export default function Layout() {
         </nav>
 
         <div className="p-3 border-t border-white/10">
-          <div className={`flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-white/10 transition-all mb-1 ${collapsed ? 'justify-center' : ''}`}>
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
-              style={{ backgroundColor: 'var(--primary)' }}
-            >
-              {user?.avatar ? (
-                <img src={user.avatar} className="w-8 h-8 rounded-full object-cover" alt="" />
-              ) : (
-                <span className="!text-white text-xs font-bold">{user?.name?.[0]?.toUpperCase()}</span>
-              )}
-            </div>
-            <AnimatePresence>
-              {!collapsed && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 min-w-0">
-                  <p className="!text-[#f8fafc] text-xs font-semibold truncate">{user?.name}</p>
-                  <p className="!text-[#cbd5e1] text-xs truncate">{user?.email}</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+  <button
+    type="button"
+    onClick={() => navigate('/settings')}
+    className={`w-full flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-white/10 transition-all mb-1 ${
+      collapsed ? 'justify-center' : ''
+    }`}
+    title="Cài đặt"
+  >
+    <div
+      className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
+      style={{ backgroundColor: 'var(--primary)' }}
+    >
+      {user?.avatar ? (
+        <img src={user.avatar} className="w-8 h-8 rounded-full object-cover" alt="" />
+      ) : (
+        <span className="!text-white text-xs font-bold">
+          {user?.name?.[0]?.toUpperCase()}
+        </span>
+      )}
+    </div>
+
+    <AnimatePresence>
+      {!collapsed && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="flex-1 min-w-0 text-left"
+        >
+          <p className="!text-[#f8fafc] text-xs font-semibold truncate">{user?.name}</p>
+          <p className="!text-[#cbd5e1] text-xs truncate">{user?.email}</p>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </button>
+
 
           <button
             onClick={handleLogout}

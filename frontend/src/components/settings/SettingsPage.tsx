@@ -373,10 +373,14 @@ export default function SettingsPage() {
   ];
 
   const timezoneOptions = [
-    { value: 'UTC', label: 'UTC' },
-    { value: 'UTC+7', label: 'GMT+7 (Hà Nội)' },
-    { value: 'UTC+8', label: 'GMT+8 (Bắc Kinh)' },
-  ];
+  { value: 'UTC', label: 'UTC' },
+  { value: 'UTC+7', label: 'GMT+7 (Hà Nội)' },
+  { value: 'UTC+8', label: 'GMT+8 (Bắc Kinh)' },
+];
+
+const selectedTimezoneLabel =
+  timezoneOptions.find(option => option.value === timezone)?.label || timezone;
+
 
   const langOptions = [
     { value: 'vi', label: 'Tiếng Việt' },
@@ -738,7 +742,7 @@ export default function SettingsPage() {
 
               <div>
                 <p className={`text-xs font-medium ${bodyText}`}>
-                  {t('settings.currentTimezone')}: {timezone}
+                  {t('settings.currentTimezone')}: {selectedTimezoneLabel}
                 </p>
 
                 <p className={`text-xs ${softText}`}>

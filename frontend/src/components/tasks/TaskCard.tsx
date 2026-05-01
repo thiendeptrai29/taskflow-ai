@@ -11,6 +11,7 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
+  Loader2,
 } from 'lucide-react';
 import { Task } from '../../types';
 import { useTaskStore } from '../../store/taskStore';
@@ -84,7 +85,6 @@ export default function TaskCard({
       } ${isOverdue ? 'border-rose-500/20' : ''}`}
     >
       <div className="flex items-start gap-3">
-        {/* Toggle button */}
         <button
           onClick={() => toggleTask(task._id)}
           className="mt-0.5 flex-shrink-0 text-slate-500 hover:text-emerald-400 transition-colors"
@@ -101,9 +101,8 @@ export default function TaskCard({
           )}
         </button>
 
-        {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
+          <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <h3
                 className={`font-semibold text-sm leading-snug ${
@@ -125,38 +124,43 @@ export default function TaskCard({
               )}
             </div>
 
-            {/* Actions */}
-            <div className="flex items-center gap-1 flex-shrink-0">
+            <div className="flex items-center gap-2 flex-shrink-0">
               <button
+                type="button"
                 onClick={() => onEdit(task)}
-                className="p-1.5 rounded-lg hover:bg-white/5 text-slate-500 hover:text-cyan-400 transition-all"
+                className="h-9 w-9 rounded-xl border border-white/10 bg-white/[0.04] text-slate-500 hover:text-cyan-400 hover:border-cyan-400/40 hover:bg-cyan-500/10 transition-all flex items-center justify-center"
                 title={t('tasks.edit')}
               >
-                <Edit3 size={14} />
+                <Edit3 size={15} />
               </button>
 
               <button
+                type="button"
                 onClick={handleDelete}
                 disabled={deleting}
-                className="p-1.5 rounded-lg hover:bg-rose-500/10 text-slate-500 hover:text-rose-400 transition-all"
+                className="h-9 w-9 rounded-xl border border-white/10 bg-white/[0.04] text-slate-500 hover:text-rose-400 hover:border-rose-500/40 hover:bg-rose-500/10 transition-all flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed"
                 title={t('tasks.delete')}
               >
-                <Trash2 size={14} />
+                {deleting ? (
+                  <Loader2 size={15} className="animate-spin" />
+                ) : (
+                  <Trash2 size={15} />
+                )}
               </button>
 
               {(task.subtasks?.length || 0) > 0 && (
                 <button
+                  type="button"
                   onClick={() => setExpanded(!expanded)}
-                  className="p-1.5 rounded-lg hover:bg-white/5 text-slate-500 hover:text-white transition-all"
+                  className="h-9 w-9 rounded-xl border border-white/10 bg-white/[0.04] text-slate-500 hover:text-white hover:border-white/20 hover:bg-white/10 transition-all flex items-center justify-center"
                   title={expanded ? t('tasks.collapse') : t('tasks.expand')}
                 >
-                  {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                  {expanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
                 </button>
               )}
             </div>
           </div>
 
-          {/* Meta row */}
           <div className="flex items-center flex-wrap gap-2 mt-2">
             <span className={`px-2 py-0.5 text-xs rounded-full font-medium badge-${task.priority}`}>
               {priorityLabels[task.priority] || task.priority}
@@ -202,7 +206,6 @@ export default function TaskCard({
             )}
           </div>
 
-          {/* Subtasks */}
           {expanded && task.subtasks && task.subtasks.length > 0 && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}

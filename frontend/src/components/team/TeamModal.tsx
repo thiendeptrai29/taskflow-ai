@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, Users } from 'lucide-react';
 import { useTeamStore, Team } from '../../store/teamStore';
+import { useLanguage } from '../../context/LanguageContext';
 import toast from 'react-hot-toast';
 
 const COLORS = [
@@ -17,6 +18,7 @@ interface Props {
 
 export default function TeamModal({ open, onClose, team }: Props) {
   const { createTeam, updateTeam } = useTeamStore();
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [color, setColor] = useState(COLORS[0]);
@@ -36,8 +38,8 @@ export default function TeamModal({ open, onClose, team }: Props) {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!name.trim()) e.name = 'Tên team là bắt buộc';
-    else if (name.trim().length < 3) e.name = 'Tên team tối thiểu 3 ký tự';
+    if (!name.trim()) e.name = t('team.teamNameRequired');
+    else if (name.trim().length < 3) e.name = t('team.teamNameMin');
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -49,14 +51,14 @@ export default function TeamModal({ open, onClose, team }: Props) {
     try {
       if (isEdit && team) {
         await updateTeam(team.id, { name: name.trim(), description: description.trim(), color });
-        toast.success('Cập nhật team thành công!');
+        toast.success(t('team.updateSuccess'));
       } else {
         await createTeam({ name: name.trim(), description: description.trim(), color });
-        toast.success('Tạo team thành công!');
+        toast.success(t('team.createSuccess'));
       }
       onClose();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || (isEdit ? 'Cập nhật thất bại' : 'Tạo team thất bại'));
+      toast.error(err.response?.data?.message || (isEdit ? t('team.updateFailed') : t('team.createFailed')));
     } finally {
       setLoading(false);
     }
@@ -83,10 +85,11 @@ export default function TeamModal({ open, onClose, team }: Props) {
                   <Users size={18} className="text-white" />
                 </div>
                 <h2 className="text-lg font-bold text-white">
-                  {isEdit ? 'Chỉnh sửa team' : 'Tạo team mới'}
+                  {isEdit ? t('team.editTitle') : t('team.createTitle')}
                 </h2>
               </div>
-              <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-all">
+              <button onClick={onClose}
+                className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-all">
                 <X size={18} />
               </button>
             </div>
@@ -95,12 +98,12 @@ export default function TeamModal({ open, onClose, team }: Props) {
               {/* Name */}
               <div>
                 <label className="block text-slate-400 text-xs font-medium mb-1.5">
-                  Tên team <span className="text-rose-400">*</span>
+                  {t('team.teamName')} <span className="text-rose-400">*</span>
                 </label>
                 <input
                   value={name}
                   onChange={e => { setName(e.target.value); setErrors(prev => ({ ...prev, name: '' })); }}
-                  placeholder="Ví dụ: Frontend Team"
+                  placeholder={t('team.teamNamePlaceholder')}
                   className={`input-dark w-full ${errors.name ? 'border-rose-500/50' : ''}`}
                 />
                 {errors.name && <p className="text-rose-400 text-xs mt-1">{errors.name}</p>}
@@ -108,11 +111,11 @@ export default function TeamModal({ open, onClose, team }: Props) {
 
               {/* Description */}
               <div>
-                <label className="block text-slate-400 text-xs font-medium mb-1.5">Mô tả</label>
+                <label className="block text-slate-400 text-xs font-medium mb-1.5">{t('team.teamDesc')}</label>
                 <textarea
                   value={description}
                   onChange={e => setDescription(e.target.value)}
-                  placeholder="Mô tả ngắn về team..."
+                  placeholder={t('team.teamDescPlaceholder')}
                   rows={3}
                   className="input-dark w-full resize-none"
                 />
@@ -120,15 +123,13 @@ export default function TeamModal({ open, onClose, team }: Props) {
 
               {/* Color */}
               <div>
-                <label className="block text-slate-400 text-xs font-medium mb-2">Màu đại diện</label>
+                <label className="block text-slate-400 text-xs font-medium mb-2">{t('team.teamColor')}</label>
                 <div className="flex gap-2 flex-wrap">
                   {COLORS.map(c => (
                     <button
-                      key={c}
-                      type="button"
-                      onClick={() => setColor(c)}
+                      key={c} type="button" onClick={() => setColor(c)}
                       className="w-8 h-8 rounded-lg transition-all hover:scale-110"
-                      style={{ background: c, outline: color === c ? `3px solid white` : 'none', outlineOffset: 2 }}
+                      style={{ background: c, outline: color === c ? '3px solid white' : 'none', outlineOffset: 2 }}
                     />
                   ))}
                 </div>
@@ -141,8 +142,8 @@ export default function TeamModal({ open, onClose, team }: Props) {
                   {name ? name[0].toUpperCase() : '?'}
                 </div>
                 <div>
-                  <p className="text-white text-sm font-medium">{name || 'Tên team'}</p>
-                  <p className="text-slate-500 text-xs">{description || 'Mô tả team'}</p>
+                  <p className="text-white text-sm font-medium">{name || t('team.teamNameDefault')}</p>
+                  <p className="text-slate-500 text-xs">{description || t('team.teamDescDefault')}</p>
                 </div>
               </div>
 
@@ -150,12 +151,12 @@ export default function TeamModal({ open, onClose, team }: Props) {
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={onClose}
                   className="flex-1 py-2.5 rounded-xl border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 text-sm font-medium transition-all">
-                  Hủy
+                  {t('team.cancel')}
                 </button>
                 <button type="submit" disabled={loading}
                   className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-500 text-white text-sm font-medium hover:opacity-90 transition-all disabled:opacity-60 flex items-center justify-center gap-2">
                   {loading && <Loader2 size={15} className="animate-spin" />}
-                  {isEdit ? 'Lưu thay đổi' : 'Tạo team'}
+                  {isEdit ? t('team.save') : t('team.create')}
                 </button>
               </div>
             </form>

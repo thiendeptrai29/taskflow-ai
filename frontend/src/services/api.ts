@@ -23,7 +23,6 @@ api.interceptors.response.use(
   }
 );
 
-// Auth
 export const authAPI = {
   register: (data: { name: string; email: string; password: string }) => api.post('/auth/register', data),
   login: (data: { email: string; password: string }) => api.post('/auth/login', data),
@@ -32,7 +31,6 @@ export const authAPI = {
   changePassword: (data: { currentPassword: string; newPassword: string }) => api.put('/auth/change-password', data),
 };
 
-// Tasks
 export const taskAPI = {
   getAll: (params?: Record<string, string>) => api.get('/tasks', { params }),
   getById: (id: string) => api.get(`/tasks/${id}`),
@@ -48,7 +46,6 @@ export const taskAPI = {
     api.patch(`/tasks/${taskId}/subtasks/${subtaskId}`, data),
 };
 
-// AI
 export const aiAPI = {
   suggestPriority: () => api.post('/ai/suggest-priority'),
   autoSchedule: (data: { date?: string; workingHours?: { start: string; end: string } }) => api.post('/ai/auto-schedule', data),
@@ -58,59 +55,56 @@ export const aiAPI = {
   smartReminders: () => api.get('/ai/smart-reminders'),
 };
 
-// Notifications
 export const notificationAPI = {
   getAll: () => api.get('/notifications'),
   markRead: () => api.patch('/notifications/mark-read'),
   delete: (id: string) => api.delete(`/notifications/${id}`),
 };
 
-// Stats
 export const statsAPI = {
   getUserStats: () => api.get('/stats'),
 };
 
-// Admin
 export const adminAPI = {
   getUsers: (params?: Record<string, string>) => api.get('/admin/users', { params }),
   toggleUser: (id: string) => api.patch(`/admin/users/${id}/toggle`),
   getStats: () => api.get('/admin/stats'),
 };
 
-// ============ Team API ============
 export const teamAPI = {
   getAll: () => api.get('/teams'),
   create: (data: Record<string, unknown>) => api.post('/teams', data),
   getById: (id: string) => api.get(`/teams/${id}`),
   update: (id: string, data: Record<string, unknown>) => api.patch(`/teams/${id}`, data),
   delete: (id: string) => api.delete(`/teams/${id}`),
- 
-  // Members
+
   invite: (id: string, email: string, role: string) =>
     api.post(`/teams/${id}/invite`, { email, role }),
   cancelInvite: (id: string, inviteId: string) =>
     api.delete(`/teams/${id}/invites/${inviteId}`),
- 
-  // ✅ Accept / Decline invite
+
   acceptInvite: (teamId: string, inviteId: string) =>
     api.post(`/teams/${teamId}/invites/${inviteId}/accept`),
   declineInvite: (teamId: string, inviteId: string) =>
     api.post(`/teams/${teamId}/invites/${inviteId}/decline`),
- 
-  // ✅ Lấy lời mời của tôi
+
   getMyInvites: () => api.get('/teams/me/invites'),
- 
-  // Member role
+
   updateMemberRole: (id: string, memberId: string, role: string) =>
     api.patch(`/teams/${id}/members/${memberId}/role`, { role }),
   removeMember: (id: string, memberId: string) =>
     api.delete(`/teams/${id}/members/${memberId}`),
- 
-  // Tasks
+
   getTasks: (id: string, params?: Record<string, string>) =>
     api.get(`/teams/${id}/tasks`, { params }),
   createTask: (id: string, data: Record<string, unknown>) =>
     api.post(`/teams/${id}/tasks`, data),
+  updateTask: (teamId: string, taskId: string, data: Record<string, unknown>) =>
+    api.patch(`/teams/${teamId}/tasks/${taskId}`, data),
+  deleteTask: (teamId: string, taskId: string) =>
+    api.delete(`/teams/${teamId}/tasks/${taskId}`),
+  getActivities: (id: string) =>
+    api.get(`/teams/${id}/activities`),
 };
 
 export default api;

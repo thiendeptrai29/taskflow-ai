@@ -2,24 +2,26 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Users, Search, RefreshCw } from 'lucide-react';
 import { useTeamStore } from '../../store/teamStore';
+import { useLanguage } from '../../context/LanguageContext';
 import TeamCard from './TeamCard';
 import TeamModal from './TeamModal';
 import { useNavigate } from 'react-router-dom';
 
 export default function TeamPage() {
   const { teams, loading, error, fetchTeams } = useTeamStore();
+  const { t } = useLanguage();
   const [showModal, setShowModal] = useState(false);
   const [editTeam, setEditTeam] = useState<any>(null);
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchTeams().catch(() => {}); // không crash nếu API chưa có
+    fetchTeams().catch(() => {});
   }, []);
 
-  const filtered = teams.filter(t =>
-    t.name.toLowerCase().includes(search.toLowerCase()) ||
-    (t.description || '').toLowerCase().includes(search.toLowerCase())
+  const filtered = teams.filter(team =>
+    team.name.toLowerCase().includes(search.toLowerCase()) ||
+    (team.description || '').toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -31,8 +33,8 @@ export default function TeamPage() {
             <Users size={20} className="text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>Teams</h1>
-            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Quản lý nhóm làm việc</p>
+            <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{t('team.title')}</h1>
+            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{t('team.subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -46,7 +48,7 @@ export default function TeamPage() {
             onClick={() => { setEditTeam(null); setShowModal(true); }}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-violet-500 text-white rounded-xl text-sm font-medium hover:opacity-90 transition-all shadow-lg"
           >
-            <Plus size={16} /> Tạo team
+            <Plus size={16} /> {t('team.createTeam')}
           </button>
         </div>
       </div>
@@ -57,7 +59,7 @@ export default function TeamPage() {
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Tìm team..."
+          placeholder={t('team.searchPlaceholder')}
           style={{ paddingLeft: '2rem' }}
           className="input-dark w-full text-sm"
         />
@@ -72,54 +74,47 @@ export default function TeamPage() {
         </div>
       )}
 
-      {/* Error - API chưa có */}
+      {/* Error */}
       {error && !loading && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass rounded-2xl p-10 text-center"
-        >
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+          className="glass rounded-2xl p-10 text-center">
           <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4 border border-amber-500/20">
             <Users size={28} className="text-amber-400" />
           </div>
-          <h3 className="text-white font-semibold mb-2">API Teams chưa sẵn sàng</h3>
+          <h3 className="text-white font-semibold mb-2">{t('team.apiNotReady')}</h3>
           <p className="text-slate-500 text-sm mb-1">
-            Backend chưa có endpoint <code className="text-cyan-400 bg-white/5 px-1.5 py-0.5 rounded">/api/teams</code>
+            {t('team.apiNotReadyDesc')}{' '}
+            <code className="text-cyan-400 bg-white/5 px-1.5 py-0.5 rounded">/api/teams</code>
           </p>
-          <p className="text-slate-600 text-xs mb-5">
-            Tạo team backend để bắt đầu sử dụng tính năng này
-          </p>
+          <p className="text-slate-600 text-xs mb-5">{t('team.apiNotReadyHint')}</p>
           <button
             onClick={() => fetchTeams().catch(() => {})}
             className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-slate-300 text-sm hover:bg-white/10 transition-all"
           >
-            Thử lại
+            {t('team.retry')}
           </button>
         </motion.div>
       )}
 
       {/* Empty */}
       {!loading && !error && filtered.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass rounded-2xl p-12 text-center"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+          className="glass rounded-2xl p-12 text-center">
           <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
             <Users size={28} className="text-slate-500" />
           </div>
           <h3 className="text-white font-semibold mb-2">
-            {search ? 'Không tìm thấy team' : 'Chưa có team nào'}
+            {search ? t('team.noTeamsSearch') : t('team.noTeams')}
           </h3>
           <p className="text-slate-500 text-sm mb-4">
-            {search ? 'Thử tìm với từ khóa khác' : 'Tạo team đầu tiên để bắt đầu cộng tác'}
+            {search ? t('team.noTeamsSearchDesc') : t('team.noTeamsDesc')}
           </p>
           {!search && (
             <button
               onClick={() => setShowModal(true)}
               className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-violet-500 text-white rounded-xl text-sm font-medium hover:opacity-90 transition-all"
             >
-              Tạo team ngay
+              {t('team.createNow')}
             </button>
           )}
         </motion.div>
