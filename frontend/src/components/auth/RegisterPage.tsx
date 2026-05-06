@@ -185,7 +185,7 @@ export default function RegisterPage() {
                   onChange={e => setForm({ ...form, password: e.target.value })}
                   placeholder="••••••••"
                   style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: '#e2e8f0', fontSize: '0.875rem' }} />
-                <button type="button" onClick={() => setShowPass(!showPass)}
+                <button type="button"tabIndex={-1} onClick={() => setShowPass(!showPass)}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#475569', padding: 0, display: 'flex' }}
                   onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
                   onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>

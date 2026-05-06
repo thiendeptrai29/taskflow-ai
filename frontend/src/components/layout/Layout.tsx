@@ -7,14 +7,16 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useLanguage } from '../../context/LanguageContext';
+import { notificationAPI } from '../../services/api';
 import NotificationPanel from './NotificationPanel';
-import InviteNotificationBanner from '../team/InviteNotificationBanner'; // ✅ Thêm
+import InviteNotificationBanner from '../team/InviteNotificationBanner';
 
 export default function Layout() {
   const [collapsed, setCollapsed] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [unreadCount, setUnreadCount] = useState(0); // ✅ Fix: thêm state đếm unread
   const { user, logout } = useAuthStore();
   const { t } = useLanguage();
   const navigate = useNavigate();
@@ -32,6 +34,22 @@ export default function Layout() {
     logout();
     navigate('/login');
   };
+
+  // ✅ Fix: fetch số thông báo chưa đọc khi mount
+  const fetchUnreadCount = async () => {
+    try {
+      const res = await notificationAPI.getAll();
+      const count =
+        res.data.notifications?.filter((n: { isRead: boolean }) => !n.isRead).length ?? 0;
+      setUnreadCount(count);
+    } catch {
+      setUnreadCount(0);
+    }
+  };
+
+  useEffect(() => {
+    fetchUnreadCount();
+  }, []);
 
   useEffect(() => {
     const saved = localStorage.getItem('settings');
@@ -62,10 +80,10 @@ export default function Layout() {
   return (
     <div className="flex h-screen overflow-hidden">
 
-      {/* ✅ Banner lời mời team — hiển thị toàn app */}
+      {/* Banner lời mời team */}
       <InviteNotificationBanner />
 
-      {/* Sidebar - Desktop (hidden on mobile) */}
+      {/* Sidebar - Desktop */}
       <motion.aside
         animate={{ width: collapsed ? 72 : 240 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
@@ -202,7 +220,6 @@ export default function Layout() {
       <AnimatePresence>
         {showMobileSidebar && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -211,7 +228,6 @@ export default function Layout() {
               className="fixed inset-0 md:hidden bg-black/50 z-30"
             />
 
-            {/* Sidebar */}
             <motion.aside
               initial={{ x: -240 }}
               animate={{ x: 0 }}
@@ -337,12 +353,15 @@ export default function Layout() {
 
           <div className="hidden md:block"></div>
 
+          {/* ✅ Fix: chấm đỏ chỉ hiện khi có unread */}
           <button
             onClick={() => setShowNotifications(!showNotifications)}
             className="relative p-2 rounded-xl !text-slate-300 hover:!text-white hover:bg-white/10 transition-all"
           >
             <Bell size={18} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full" />
+            )}
           </button>
         </header>
 
@@ -353,7 +372,10 @@ export default function Layout() {
 
       <AnimatePresence>
         {showNotifications && (
-          <NotificationPanel onClose={() => setShowNotifications(false)} />
+          <NotificationPanel
+            onClose={() => setShowNotifications(false)}
+            onRead={() => setUnreadCount(0)} // ✅ Fix: reset badge khi đọc hết
+          />
         )}
       </AnimatePresence>
     </div>

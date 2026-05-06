@@ -14,7 +14,14 @@ const typeIcons: Record<string, React.ReactNode> = {
   reminder: <Bell size={14} className="text-violet-400" />,
 };
 
-export default function NotificationPanel({ onClose }: { onClose: () => void }) {
+
+export default function NotificationPanel({ 
+  onClose, 
+  onRead 
+}: { 
+  onClose: () => void;
+  onRead?: () => void;  // ← thêm
+}) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -34,12 +41,19 @@ export default function NotificationPanel({ onClose }: { onClose: () => void }) 
   const markAllRead = async () => {
     await notificationAPI.markRead();
     setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+     onRead?.();
   };
 
   const deleteNotification = async (id: string) => {
     await notificationAPI.delete(id);
-    setNotifications(prev => prev.filter(n => n._id !== id));
+    setNotifications(prev => {
+      const updated = prev.filter(n => n._id !== id);
+      // Nếu không còn unread nào thì reset badge
+      if (!updated.some(n => !n.isRead)) onRead?.();
+      return updated;
+    });
   };
+  
 
   return (
     <>

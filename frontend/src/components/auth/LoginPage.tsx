@@ -231,6 +231,7 @@ export default function LoginPage() {
                 />
                 <button
                   type="button"
+                  tabIndex={-1}
                   onClick={() => setShowPass(!showPass)}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#475569', padding: 0, display: 'flex', transition: 'color 0.2s' }}
                   onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-
+const Notification = require('../models/Notification');
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d'
@@ -23,6 +23,13 @@ const register = async (req, res) => {
     }
 
     const user = await User.create({ name, email, password });
+    Notification.create({
+  user: user._id,
+  type: 'system',
+  title: '🎉 Chào mừng đến với TaskFlow AI!',
+  message: `Xin chào ${user.name}! Tài khoản đã được tạo thành công. Hãy bắt đầu bằng cách tạo task đầu tiên nhé 🚀`,
+  isRead: false,
+}).catch(err => console.error('Welcome notification error:', err));
     const token = generateToken(user._id);
 
     res.status(201).json({
