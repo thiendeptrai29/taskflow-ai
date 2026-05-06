@@ -127,32 +127,32 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6 animate-fade-in">
-        <div className="h-8 skeleton rounded-lg w-64" />
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="space-y-4 md:space-y-6 animate-fade-in">
+        <div className="h-6 md:h-8 skeleton rounded-lg w-48 md:w-64" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {[...Array(4)].map((_, index) => (
-            <div key={index} className="h-32 skeleton rounded-2xl" />
+            <div key={index} className="h-28 md:h-32 skeleton rounded-2xl" />
           ))}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="h-64 skeleton rounded-2xl" />
-          <div className="h-64 skeleton rounded-2xl" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+          <div className="h-48 md:h-64 skeleton rounded-2xl" />
+          <div className="h-48 md:h-64 skeleton rounded-2xl" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 md:space-y-6 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-xl md:text-2xl font-bold text-white">
             {greeting()},{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">
               {user?.name?.split(' ').pop()} 👋
             </span>
           </h1>
-          <p className="text-slate-400 text-sm mt-1 capitalize">
+          <p className="text-slate-400 text-xs md:text-sm mt-1 capitalize">
             {format(new Date(), 'EEEE, d MMMM yyyy', { locale: dateLocale })}
           </p>
         </div>
@@ -167,13 +167,13 @@ export default function DashboardPage() {
             <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
           </button>
 
-          <Link to="/tasks" className="btn-primary flex items-center gap-2 text-sm">
-            <Plus size={16} /> {t('dashboard.createTask')}
+          <Link to="/tasks" className="btn-primary flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 md:py-2.5">
+            <Plus size={14} className="md:size-4" /> <span className="hidden sm:inline">{t('dashboard.createTask')}</span><span className="sm:hidden">+</span>
           </Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <StatCard
           icon={Target}
           label={t('dashboard.totalTasks')}
@@ -201,16 +201,16 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 glass rounded-2xl p-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+        <div className="lg:col-span-2 glass rounded-2xl p-4 md:p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-white text-sm flex items-center gap-2">
+            <h3 className="font-semibold text-white text-xs md:text-sm flex items-center gap-2">
               <TrendingUp size={16} className="text-cyan-400" />
               {t('dashboard.last7Days')}
             </h3>
           </div>
 
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={150} minHeight={150} minWidth="100%">
             <AreaChart data={stats?.dailyStats ?? []}>
               <defs>
                 <linearGradient id="colorCreated" x1="0" y1="0" x2="0" y2="1">
@@ -225,12 +225,12 @@ export default function DashboardPage() {
 
               <XAxis
                 dataKey="date"
-                tick={{ fill: dark ? '#475569' : '#64748b', fontSize: 11 }}
+                tick={{ fill: dark ? '#475569' : '#64748b', fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fill: dark ? '#475569' : '#64748b', fontSize: 11 }}
+                tick={{ fill: dark ? '#475569' : '#64748b', fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -260,15 +260,15 @@ export default function DashboardPage() {
           </ResponsiveContainer>
         </div>
 
-        <div className="glass rounded-2xl p-5">
-          <h3 className="font-semibold text-white text-sm mb-4 flex items-center gap-2">
+        <div className="glass rounded-2xl p-4 md:p-5">
+          <h3 className="font-semibold text-white text-xs md:text-sm mb-4 flex items-center gap-2">
             <Zap size={16} className="text-amber-400" />
             {t('dashboard.byPriority')}
           </h3>
 
           {priorityChartData.length > 0 ? (
             <>
-              <ResponsiveContainer width="100%" height={140}>
+              <ResponsiveContainer width="100%" height={120} minHeight={100} minWidth="100%">
                 <PieChart>
                   <Pie
                     data={priorityChartData}
@@ -276,8 +276,8 @@ export default function DashboardPage() {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    innerRadius={40}
-                    outerRadius={65}
+                    innerRadius={30}
+                    outerRadius={50}
                   >
                     {priorityChartData.map(entry => (
                       <Cell key={entry.key} fill={PRIORITY_COLORS[entry.key] || '#475569'} />
@@ -292,50 +292,50 @@ export default function DashboardPage() {
                 </PieChart>
               </ResponsiveContainer>
 
-              <div className="space-y-1.5 mt-2">
+              <div className="space-y-1 md:space-y-1.5 mt-2">
                 {priorityChartData.map(item => (
                   <div key={item.key} className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
                       <span
-                        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                        className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full flex-shrink-0"
                         style={{ background: PRIORITY_COLORS[item.key] }}
                       />
-                      <span className="text-slate-400">
+                      <span className="text-slate-400 truncate">
                         {item.name}
                       </span>
                     </div>
-                    <span className="font-semibold text-slate-200">{item.count}</span>
+                    <span className="font-semibold text-slate-200 flex-shrink-0">{item.count}</span>
                   </div>
                 ))}
               </div>
             </>
           ) : (
-            <p className="text-slate-500 text-sm text-center mt-8">
+            <p className="text-slate-500 text-xs md:text-sm text-center mt-8">
               {t('dashboard.noData')}
             </p>
           )}
         </div>
       </div>
 
-      <div className="glass rounded-2xl p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-white text-sm flex items-center gap-2">
-            <Clock size={16} className="text-violet-400" />
-            {t('dashboard.upcoming')}
+      <div className="glass rounded-2xl p-4 md:p-5">
+        <div className="flex items-center justify-between mb-4 gap-2">
+          <h3 className="font-semibold text-white text-xs md:text-sm flex items-center gap-2 flex-shrink-0">
+            <Clock size={16} className="text-violet-400 flex-shrink-0" />
+            <span className="truncate">{t('dashboard.upcoming')}</span>
           </h3>
 
           <Link
             to="/tasks"
-            className="text-cyan-400 text-xs hover:text-cyan-300 flex items-center gap-1 transition-colors"
+            className="text-cyan-400 text-xs hover:text-cyan-300 flex items-center gap-1 transition-colors flex-shrink-0"
           >
             {t('dashboard.viewAll')} <ArrowRight size={12} />
           </Link>
         </div>
 
         {upcomingTasks.length === 0 ? (
-          <div className="text-center py-8 text-slate-500">
-            <CheckCircle2 size={32} className="mx-auto mb-2 opacity-30" />
-            <p className="text-sm">{t('dashboard.noUpcoming')}</p>
+          <div className="text-center py-6 md:py-8 text-slate-500">
+            <CheckCircle2 size={28} className="md:size-8 mx-auto mb-2 opacity-30" />
+            <p className="text-xs md:text-sm">{t('dashboard.noUpcoming')}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -343,7 +343,7 @@ export default function DashboardPage() {
               <motion.div
                 key={task._id}
                 whileHover={{ x: 2 }}
-                className="flex items-center gap-4 p-3 rounded-xl bg-white/3 hover:bg-white/5 transition-all"
+                className="flex items-center gap-3 md:gap-4 p-3 rounded-xl bg-white/3 hover:bg-white/5 transition-all"
               >
                 <div
                   className={`w-2 h-2 rounded-full flex-shrink-0 ${
@@ -355,7 +355,7 @@ export default function DashboardPage() {
                   }`}
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-slate-200 text-sm font-medium truncate">{task.title}</p>
+                  <p className="text-slate-200 text-xs md:text-sm font-medium truncate">{task.title}</p>
                   {task.deadline && (
                     <p className="text-slate-500 text-xs mt-0.5">
                       {format(new Date(task.deadline), 'd MMM yyyy, HH:mm', { locale: dateLocale })}
@@ -363,7 +363,7 @@ export default function DashboardPage() {
                   )}
                 </div>
 
-                <span className={`px-2 py-0.5 text-xs rounded-full font-medium badge-${task.priority}`}>
+                <span className={`px-2 py-0.5 text-xs rounded-full font-medium badge-${task.priority} flex-shrink-0 whitespace-nowrap`}>
                   {priorityShortLabel[task.priority]}
                 </span>
               </motion.div>
@@ -375,21 +375,21 @@ export default function DashboardPage() {
       <Link to="/ai">
         <motion.div
           whileHover={{ scale: 1.01 }}
-          className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-r from-cyan-500/10 via-violet-500/10 to-rose-500/10 border border-white/10 cursor-pointer group"
+          className="relative overflow-hidden rounded-2xl p-4 md:p-6 bg-gradient-to-r from-cyan-500/10 via-violet-500/10 to-rose-500/10 border border-white/10 cursor-pointer group"
         >
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center shadow-xl animate-float">
-              <Sparkles size={28} className="text-white" />
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4">
+            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center shadow-xl animate-float flex-shrink-0">
+              <Sparkles size={24} className="md:size-7 text-white" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-bold text-white">AI Assistant</h3>
-              <p className="text-slate-400 text-sm">
+              <h3 className="text-base md:text-lg font-bold text-white">AI Assistant</h3>
+              <p className="text-slate-400 text-xs md:text-sm">
                 {t('dashboard.aiDescription')}
               </p>
             </div>
             <ArrowRight
-              size={20}
-              className="text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all"
+              size={18}
+              className="md:size-5 text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all flex-shrink-0"
             />
           </div>
         </motion.div>

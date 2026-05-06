@@ -84,44 +84,44 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="space-y-5 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <CalendarIcon size={24} className="text-violet-400" />
+    <div className="space-y-4 md:space-y-5 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4">
+        <h1 className="text-lg md:text-2xl font-bold text-white flex items-center gap-2">
+          <CalendarIcon size={20} className="md:size-6 text-violet-400" />
           {t('calendar.title')}
         </h1>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1 md:gap-3 flex-shrink-0">
           <button
             onClick={prevMonth}
-            className="p-2 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition-all"
+            className="p-2 rounded-lg md:rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition-all"
             title={t('calendar.prevMonth')}
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={16} className="md:size-5" />
           </button>
 
-          <span className="text-white font-semibold min-w-32 text-center capitalize">
-            {format(currentDate, 'MMMM yyyy', { locale: dateLocale })}
+          <span className="text-white font-semibold text-xs md:text-sm text-center capitalize min-w-20 md:min-w-32">
+            {format(currentDate, 'MMM yyyy', { locale: dateLocale })}
           </span>
 
           <button
             onClick={nextMonth}
-            className="p-2 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition-all"
+            className="p-2 rounded-lg md:rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition-all"
             title={t('calendar.nextMonth')}
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={16} className="md:size-5" />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-5">
         {/* Calendar grid */}
-        <div className="lg:col-span-2 glass rounded-2xl p-5">
-          <div className="grid grid-cols-7 mb-3">
+        <div className="lg:col-span-2 glass rounded-2xl p-3 md:p-5">
+          <div className="grid grid-cols-7 mb-2 md:mb-3 gap-px">
             {dayHeaders.map(day => (
               <div
                 key={day}
-                className="text-center text-xs font-semibold text-slate-500 py-2"
+                className="text-center text-xs font-semibold text-slate-500 py-1 md:py-2"
               >
                 {day}
               </div>
@@ -131,7 +131,7 @@ export default function CalendarPage() {
           {loading ? (
             <div className="grid grid-cols-7 gap-1">
               {[...Array(35)].map((_, index) => (
-                <div key={index} className="h-14 skeleton rounded-lg" />
+                <div key={index} className="h-10 md:h-14 skeleton rounded-lg" />
               ))}
             </div>
           ) : (
@@ -149,14 +149,14 @@ export default function CalendarPage() {
                     key={key}
                     whileHover={{ scale: 1.05 }}
                     onClick={() => setSelectedDay(isSelected ? null : day)}
-                    className={`relative p-1 rounded-xl min-h-14 flex flex-col items-center transition-all ${
+                    className={`relative p-1 rounded-lg md:rounded-xl min-h-10 md:min-h-14 flex flex-col items-center transition-all ${
                       isSelected
                         ? 'bg-cyan-500/20 border border-cyan-500/40'
                         : 'hover:bg-white/5'
                     } ${!isSameMonth(day, currentDate) ? 'opacity-30' : ''}`}
                   >
                     <span
-                      className={`text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full mb-1 ${
+                      className={`text-xs font-semibold w-5 md:w-6 h-5 md:h-6 flex items-center justify-center rounded-full mb-0.5 md:mb-1 ${
                         todayDay ? 'bg-cyan-500 text-white' : 'text-slate-300'
                       }`}
                     >
@@ -167,7 +167,7 @@ export default function CalendarPage() {
                       {dayTasks.slice(0, 3).map(task => (
                         <span
                           key={task._id}
-                          className={`w-1.5 h-1.5 rounded-full ${PRIORITY_DOT[task.priority]}`}
+                          className={`w-1 md:w-1.5 h-1 md:h-1.5 rounded-full ${PRIORITY_DOT[task.priority]}`}
                         />
                       ))}
 
@@ -185,19 +185,19 @@ export default function CalendarPage() {
         </div>
 
         {/* Selected day tasks */}
-        <div className="glass rounded-2xl p-5">
-          <h3 className="font-semibold text-white text-sm mb-4">
+        <div className="glass rounded-2xl p-3 md:p-5">
+          <h3 className="font-semibold text-white text-xs md:text-sm mb-3 md:mb-4 truncate">
             {selectedDay
-              ? format(selectedDay, 'EEEE, d MMMM', { locale: dateLocale })
+              ? format(selectedDay, 'EEEE, d MMM', { locale: dateLocale })
               : t('calendar.chooseDay')}
           </h3>
 
           {!selectedDay ? (
-            <p className="text-slate-500 text-sm text-center mt-8">
+            <p className="text-slate-500 text-xs md:text-sm text-center mt-8">
               {t('calendar.chooseDayHint')}
             </p>
           ) : selectedTasks.length === 0 ? (
-            <p className="text-slate-500 text-sm text-center mt-8">
+            <p className="text-slate-500 text-xs md:text-sm text-center mt-8">
               {t('calendar.noTasksDay')}
             </p>
           ) : (

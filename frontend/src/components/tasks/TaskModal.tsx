@@ -100,27 +100,27 @@ export default function TaskModal({ task, onClose }: Props) {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-3 md:p-4 bg-black/60 backdrop-blur-sm"
       onClick={e => e.target === e.currentTarget && onClose()}
     >
       <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }}
-        className="w-full max-w-lg glass rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+        className="w-full md:max-w-lg glass rounded-t-2xl md:rounded-2xl overflow-hidden max-h-[95vh] md:max-h-[90vh] overflow-y-auto"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
-          <h2 className="font-bold text-white text-base flex items-center gap-2">
-            <ListTodo size={18} className="text-cyan-400" />
-            {task ? t('tasks.editTask') : t('tasks.createTask')}
+        <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-white/5 flex-shrink-0">
+          <h2 className="font-bold text-white text-sm md:text-base flex items-center gap-2">
+            <ListTodo size={16} className="md:size-5 text-cyan-400" />
+            <span className="truncate">{task ? t('tasks.editTask') : t('tasks.createTask')}</span>
           </h2>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             {!task && (
               <button onClick={() => setShowAI(!showAI)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium hover:bg-cyan-500/20 transition-all">
-                <Sparkles size={13} /> {t('tasks.aiCreateTask')}
+                className="flex items-center gap-1 px-2 md:px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium hover:bg-cyan-500/20 transition-all whitespace-nowrap">
+                <Sparkles size={11} className="md:size-3" /> <span className="hidden sm:inline">{t('tasks.aiCreateTask')}</span>
               </button>
             )}
-            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white transition-all">
-              <X size={18} />
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white transition-all flex-shrink-0">
+              <X size={16} className="md:size-5" />
             </button>
           </div>
         </div>
@@ -128,10 +128,9 @@ export default function TaskModal({ task, onClose }: Props) {
         {/* AI section */}
         {showAI && (
           <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }}
-            className="px-6 py-4 bg-cyan-500/5 border-b border-cyan-500/10"
+            className="px-4 md:px-6 py-3 md:py-4 bg-cyan-500/5 border-b border-cyan-500/10"
           >
             <p className="text-xs text-cyan-400 font-medium mb-1">{t('tasks.aiNaturalPrompt')}</p>
-            {/* ✅ Hint mới: AI tạo thẳng, không cần nhấn thêm */}
             <p className="text-xs text-slate-500 mb-2">
               AI sẽ phân tích và <strong className="text-cyan-400">tạo task luôn</strong> — không cần điền thêm
             </p>
@@ -143,40 +142,40 @@ export default function TaskModal({ task, onClose }: Props) {
               rows={3}
               placeholder={t('tasks.aiPlaceholder')}
             />
-            <div className="flex items-center justify-between mt-2">
-              <p className="text-slate-600 text-xs">Ctrl+Enter để tạo nhanh</p>
+            <div className="flex items-center justify-between mt-2 gap-2">
+              <p className="text-slate-600 text-xs hidden sm:block">Ctrl+Enter để tạo nhanh</p>
               <button onClick={handleAICreate} disabled={aiLoading || !aiText.trim()}
-                className="btn-primary text-xs flex items-center gap-1.5 disabled:opacity-50"
+                className="btn-primary text-xs flex items-center gap-1.5 disabled:opacity-50 flex-shrink-0"
               >
-                {aiLoading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
-                {aiLoading ? 'Đang tạo task...' : t('tasks.createWithAI')}
+                {aiLoading ? <Loader2 size={11} className="md:size-3 animate-spin" /> : <Sparkles size={11} className="md:size-3" />}
+                <span className="hidden sm:inline">{aiLoading ? 'Đang tạo task...' : t('tasks.createWithAI')}</span><span className="sm:hidden">{aiLoading ? '...' : 'Tạo'}</span>
               </button>
             </div>
           </motion.div>
         )}
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-3 md:p-6 space-y-3 md:space-y-4">
           {/* Title */}
           <div>
             <label className="block text-slate-400 text-xs font-medium mb-1.5">{t('tasks.title')} *</label>
             <input value={form.title} onChange={e => set('title', e.target.value)}
-              className="input-dark" placeholder={t('tasks.titlePlaceholder')} />
+              className="input-dark text-xs md:text-sm" placeholder={t('tasks.titlePlaceholder')} />
           </div>
 
           {/* Description */}
           <div>
             <label className="flex text-slate-400 text-xs font-medium mb-1.5 items-center gap-1">
-              <AlignLeft size={11} /> {t('tasks.description')}
+              <AlignLeft size={10} className="md:size-3" /> {t('tasks.description')}
             </label>
             <textarea value={form.description} onChange={e => set('description', e.target.value)}
-              className="input-dark resize-none" rows={3} placeholder={t('tasks.descriptionPlaceholder')} />
+              className="input-dark resize-none text-xs md:text-sm" rows={2} placeholder={t('tasks.descriptionPlaceholder')} />
           </div>
 
           {/* Priority & Status */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 md:gap-3">
             <div>
               <label className="block text-slate-400 text-xs font-medium mb-1.5">{t('tasks.priority')}</label>
-              <select value={form.priority} onChange={e => set('priority', e.target.value)} className="input-dark">
+              <select value={form.priority} onChange={e => set('priority', e.target.value)} className="input-dark text-xs md:text-sm">
                 <option value="low">🟢 {t('tasks.priorityLow')}</option>
                 <option value="medium">🟡 {t('tasks.priorityMedium')}</option>
                 <option value="high">🔴 {t('tasks.priorityHigh')}</option>
@@ -184,7 +183,7 @@ export default function TaskModal({ task, onClose }: Props) {
             </div>
             <div>
               <label className="block text-slate-400 text-xs font-medium mb-1.5">{t('tasks.status')}</label>
-              <select value={form.status} onChange={e => set('status', e.target.value)} className="input-dark">
+              <select value={form.status} onChange={e => set('status', e.target.value)} className="input-dark text-xs md:text-sm">
                 <option value="pending">{t('tasks.statusPending')}</option>
                 <option value="in-progress">{t('tasks.statusInProgress')}</option>
                 <option value="completed">{t('tasks.statusCompleted')}</option>
@@ -196,27 +195,27 @@ export default function TaskModal({ task, onClose }: Props) {
           {/* Deadline */}
           <div>
             <label className="flex text-slate-400 text-xs font-medium mb-1.5 items-center gap-1">
-              <Clock size={11} /> {t('tasks.deadline')}
+              <Clock size={10} className="md:size-3" /> {t('tasks.deadline')}
             </label>
             <DatePicker selected={deadline} onChange={(d: Date | null) => setDeadline(d)}
               showTimeSelect dateFormat="dd/MM/yyyy HH:mm"
               placeholderText={t('tasks.deadlinePlaceholder')}
-              className="input-dark w-full" minDate={new Date()} isClearable />
+              className="input-dark w-full text-xs md:text-sm" minDate={new Date()} isClearable />
           </div>
 
           {/* Category & Tags */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 md:gap-3">
             <div>
               <label className="block text-slate-400 text-xs font-medium mb-1.5">{t('tasks.category')}</label>
               <input value={form.category} onChange={e => set('category', e.target.value)}
-                className="input-dark" placeholder={t('tasks.categoryPlaceholder')} />
+                className="input-dark text-xs md:text-sm" placeholder={t('tasks.categoryPlaceholder')} />
             </div>
             <div>
               <label className="flex text-slate-400 text-xs font-medium mb-1.5 items-center gap-1">
-                <Tag size={11} /> Tags
+                <Tag size={10} className="md:size-3" /> Tags
               </label>
               <input value={form.tags} onChange={e => set('tags', e.target.value)}
-                className="input-dark" placeholder={t('tasks.tagsPlaceholder')} />
+                className="input-dark text-xs md:text-sm" placeholder={t('tasks.tagsPlaceholder')} />
             </div>
           </div>
 
@@ -224,29 +223,29 @@ export default function TaskModal({ task, onClose }: Props) {
           <div>
             <label className="block text-slate-400 text-xs font-medium mb-1.5">{t('tasks.estimatedDuration')}</label>
             <input type="number" value={form.estimatedDuration} onChange={e => set('estimatedDuration', +e.target.value)}
-              className="input-dark" min={5} max={480} />
+              className="input-dark text-xs md:text-sm" min={5} max={480} />
           </div>
 
           {/* Subtasks */}
           <div>
             <label className="block text-slate-400 text-xs font-medium mb-2">{t('tasks.subtasks')}</label>
-            <div className="space-y-1.5 mb-2">
+            <div className="space-y-1 md:space-y-1.5 mb-2">
               {form.subtasks.map((st, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <span className="flex-1 text-xs text-slate-300 bg-white/5 px-3 py-1.5 rounded-lg">{st}</span>
-                  <button type="button" onClick={() => removeSubtask(i)} className="text-slate-600 hover:text-rose-400 transition-colors">
-                    <Trash2 size={13} />
+                <div key={i} className="flex items-center gap-1 md:gap-2">
+                  <span className="flex-1 text-xs text-slate-300 bg-white/5 px-2 md:px-3 py-1.5 rounded-lg truncate">{st}</span>
+                  <button type="button" onClick={() => removeSubtask(i)} className="text-slate-600 hover:text-rose-400 transition-colors flex-shrink-0">
+                    <Trash2 size={12} className="md:size-4" />
                   </button>
                 </div>
               ))}
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-1 md:gap-2">
               <input value={newSubtask} onChange={e => setNewSubtask(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addSubtask())}
-                className="input-dark flex-1 text-xs" placeholder={t('tasks.addSubtaskPlaceholder')} />
+                className="input-dark flex-1 text-xs md:text-sm" placeholder={t('tasks.addSubtaskPlaceholder')} />
               <button type="button" onClick={addSubtask}
-                className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-all">
-                <Plus size={14} />
+                className="px-2 md:px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-all flex-shrink-0">
+                <Plus size={12} className="md:size-4" />
               </button>
             </div>
           </div>
@@ -255,14 +254,14 @@ export default function TaskModal({ task, onClose }: Props) {
           <div>
             <label className="block text-slate-400 text-xs font-medium mb-1.5">{t('tasks.notes')}</label>
             <textarea value={form.notes} onChange={e => set('notes', e.target.value)}
-              className="input-dark resize-none" rows={2} placeholder={t('tasks.notesPlaceholder')} />
+              className="input-dark resize-none text-xs md:text-sm" rows={2} placeholder={t('tasks.notesPlaceholder')} />
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="btn-ghost flex-1">{t('tasks.cancel')}</button>
-            <button type="submit" disabled={loading} className="btn-primary flex-1 flex items-center justify-center gap-2">
-              {loading && <Loader2 size={15} className="animate-spin" />}
+          <div className="flex gap-2 md:gap-3 pt-2">
+            <button type="button" onClick={onClose} className="btn-ghost flex-1 text-xs md:text-sm">{t('tasks.cancel')}</button>
+            <button type="submit" disabled={loading} className="btn-primary flex-1 flex items-center justify-center gap-2 text-xs md:text-sm">
+              {loading && <Loader2 size={12} className="md:size-4 animate-spin" />}
               {task ? t('tasks.update') : t('tasks.createTaskSubmit')}
             </button>
           </div>
