@@ -21,12 +21,12 @@ type Option = {
 const Toggle = ({ value, onChange }: { value: boolean; onChange: () => void }) => (
   <button
     onClick={onChange}
-    className={`relative w-12 h-6 rounded-full transition-all duration-300 focus:outline-none ${
+    className={`relative w-11 h-6 rounded-full transition-all duration-300 focus:outline-none flex-shrink-0 ${
       value ? 'bg-gradient-to-r from-cyan-500 to-violet-500' : 'bg-slate-300 dark:bg-white/10'
     }`}
   >
     <motion.div
-      animate={{ x: value ? 24 : 2 }}
+      animate={{ x: value ? 22 : 2 }}
       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
       className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg"
     />
@@ -63,31 +63,32 @@ const CustomDropdown = ({
   }, []);
 
   return (
-    <div ref={wrapperRef} className="w-[280px] max-w-full">
+    /* Fixed: w-full instead of fixed w-[280px] to avoid overflow on mobile */
+    <div ref={wrapperRef} className="relative w-full max-w-[200px] sm:max-w-[280px]">
       <motion.button
         type="button"
-        whileHover={{ scale: 1.02 }}
+        whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => setOpen(current => !current)}
-        className={`h-12 w-full flex items-center justify-between gap-3 rounded-xl px-4 border transition-all duration-200 outline-none ${
+        className={`h-10 w-full flex items-center justify-between gap-2 rounded-xl px-3 border transition-all duration-200 outline-none ${
           dark
-            ? 'bg-white/[0.04] border-white/[0.08] hover:border-cyan-400/40 hover:shadow-[0_0_18px_rgba(34,211,238,0.12)]'
-            : 'bg-white/80 border-slate-200 hover:border-cyan-400/50 hover:shadow-[0_0_18px_rgba(14,165,233,0.12)]'
+            ? 'bg-white/[0.04] border-white/[0.08] hover:border-cyan-400/40'
+            : 'bg-white/80 border-slate-200 hover:border-cyan-400/50'
         } ${open ? 'ring-2 ring-cyan-500/20 border-cyan-400/50' : ''}`}
       >
-        <div className="flex items-center gap-3 min-w-0">
+        <div className="flex items-center gap-2 min-w-0">
           <div
-            className={`w-8 h-8 rounded-lg flex items-center justify-center border flex-shrink-0 ${
+            className={`w-6 h-6 rounded-lg flex items-center justify-center border flex-shrink-0 ${
               dark
                 ? 'bg-white/[0.05] border-white/[0.08]'
                 : 'bg-slate-50 border-slate-200'
             }`}
           >
-            <Icon size={15} className="text-cyan-400" />
+            <Icon size={12} className="text-cyan-400" />
           </div>
 
           <span
-            className={`px-2.5 py-1 rounded-lg text-xs font-semibold truncate border bg-gradient-to-r ${
+            className={`px-2 py-0.5 rounded-lg text-xs font-semibold truncate border bg-gradient-to-r ${
               dark
                 ? 'from-cyan-500/15 to-violet-500/15 border-cyan-400/20 text-slate-100'
                 : 'from-cyan-500/10 to-violet-500/10 border-cyan-500/20 text-slate-900'
@@ -97,8 +98,8 @@ const CustomDropdown = ({
           </span>
         </div>
 
-        <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
-          <ChevronDown size={15} className={dark ? 'text-slate-400' : 'text-slate-500'} />
+        <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }} className="flex-shrink-0">
+          <ChevronDown size={13} className={dark ? 'text-slate-400' : 'text-slate-500'} />
         </motion.div>
       </motion.button>
 
@@ -109,7 +110,8 @@ const CustomDropdown = ({
             animate={{ opacity: 1, y: 0, height: 'auto' }}
             exit={{ opacity: 0, y: -6, height: 0 }}
             transition={{ duration: 0.2 }}
-            className={`mt-2 max-h-48 overflow-y-auto rounded-xl border p-1.5 shadow-2xl backdrop-blur-xl ${
+            /* Fixed: right-0 to avoid overflow on narrow screens */
+            className={`absolute right-0 z-50 mt-2 w-full min-w-[140px] max-h-48 overflow-y-auto rounded-xl border p-1.5 shadow-2xl backdrop-blur-xl ${
               dark
                 ? 'bg-[#111827]/95 border-white/[0.08] shadow-black/30'
                 : 'bg-white/95 border-slate-200 shadow-slate-300/30'
@@ -126,7 +128,7 @@ const CustomDropdown = ({
                     onChange(option.value);
                     setOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-left text-sm transition-all ${
+                  className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-left text-xs transition-all ${
                     active
                       ? 'bg-gradient-to-r from-cyan-500/20 to-violet-500/15 text-cyan-300'
                       : dark
@@ -135,7 +137,7 @@ const CustomDropdown = ({
                   }`}
                 >
                   <span className="truncate">{option.label}</span>
-                  {active && <Check size={14} className="text-cyan-400 flex-shrink-0" />}
+                  {active && <Check size={12} className="text-cyan-400 flex-shrink-0" />}
                 </button>
               );
             })}
@@ -162,30 +164,32 @@ const SettingRow = ({
   dark: boolean;
 }) => (
   <motion.div
-    whileHover={{ x: 2 }}
-    className={`flex items-start justify-between gap-4 px-4 py-3.5 rounded-xl transition-all group ${
+    whileHover={{ x: 1 }}
+    className={`flex items-center justify-between gap-3 px-3 py-3 rounded-xl transition-all group ${
       dark ? 'hover:bg-white/[0.03]' : 'hover:bg-slate-100/70'
     }`}
   >
-    <div className="flex items-center gap-3 min-w-0 pt-1.5">
+    {/* Left side: icon + text */}
+    <div className="flex items-center gap-3 min-w-0 flex-1">
       <div
-        className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all flex-shrink-0 ${
+        className={`w-8 h-8 rounded-xl border flex items-center justify-center flex-shrink-0 ${
           dark
             ? 'bg-white/[0.04] border-white/[0.08] group-hover:border-white/20'
             : 'bg-white border-slate-200 group-hover:border-slate-300'
         }`}
       >
-        <Icon size={16} className={color} />
+        <Icon size={14} className={color} />
       </div>
       <div className="min-w-0">
-        <p className={`text-sm font-semibold ${dark ? 'text-slate-200' : 'text-slate-900'}`}>
+        <p className={`text-xs font-semibold leading-tight ${dark ? 'text-slate-200' : 'text-slate-900'}`}>
           {label}
         </p>
-        <p className={`text-xs ${dark ? 'text-slate-400' : 'text-slate-600'}`}>
+        <p className={`text-xs mt-0.5 leading-tight ${dark ? 'text-slate-500' : 'text-slate-500'}`}>
           {desc}
         </p>
       </div>
     </div>
+    {/* Right side: control */}
     <div className="flex-shrink-0">{children}</div>
   </motion.div>
 );
@@ -205,7 +209,9 @@ const NavItem = ({
 }) => (
   <button
     onClick={onClick}
-    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+    /* Fixed: flex-shrink-0 + whitespace-nowrap for horizontal scroll on mobile,
+       md:w-full for full width on desktop */
+    className={`flex-shrink-0 md:w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${
       active
         ? 'bg-gradient-to-r from-cyan-500/20 to-violet-500/10 text-cyan-400 border border-cyan-500/20'
         : dark
@@ -213,9 +219,9 @@ const NavItem = ({
           : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100'
     }`}
   >
-    <Icon size={16} />
+    <Icon size={14} className="flex-shrink-0" />
     <span>{label}</span>
-    {active && <ChevronRight size={14} className="ml-auto" />}
+    {active && <ChevronRight size={12} className="ml-auto hidden md:block" />}
   </button>
 );
 
@@ -233,7 +239,7 @@ const InputRow = ({
       dark ? 'bg-white/5 border-white/10' : 'bg-white border-slate-300'
     }`}
   >
-    <Icon size={15} className="text-slate-500 flex-shrink-0" />
+    <Icon size={14} className="text-slate-500 flex-shrink-0" />
     {children}
   </div>
 );
@@ -373,14 +379,13 @@ export default function SettingsPage() {
   ];
 
   const timezoneOptions = [
-  { value: 'UTC', label: 'UTC' },
-  { value: 'UTC+7', label: 'GMT+7 (Hà Nội)' },
-  { value: 'UTC+8', label: 'GMT+8 (Bắc Kinh)' },
-];
+    { value: 'UTC', label: 'UTC' },
+    { value: 'UTC+7', label: 'GMT+7 (Hà Nội)' },
+    { value: 'UTC+8', label: 'GMT+8 (Bắc Kinh)' },
+  ];
 
-const selectedTimezoneLabel =
-  timezoneOptions.find(option => option.value === timezone)?.label || timezone;
-
+  const selectedTimezoneLabel =
+    timezoneOptions.find(option => option.value === timezone)?.label || timezone;
 
   const langOptions = [
     { value: 'vi', label: 'Tiếng Việt' },
@@ -388,10 +393,11 @@ const selectedTimezoneLabel =
   ];
 
   return (
-    <div className="animate-fade-in space-y-1">
-      <div className="flex items-center justify-between mb-6">
+    <div className="animate-fade-in space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className={`text-2xl font-bold flex items-center gap-2 ${titleText}`}>
+          <h1 className={`text-xl font-bold flex items-center gap-2 ${titleText}`}>
             ⚙️ {t('settings.title')}
           </h1>
           <p className={`text-xs mt-0.5 ${mutedText}`}>
@@ -403,7 +409,7 @@ const selectedTimezoneLabel =
           <motion.button
             onClick={handleSave}
             whileTap={{ scale: 0.95 }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-all flex-shrink-0 ${
               saved
                 ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
                 : 'bg-gradient-to-r from-cyan-500 to-violet-500 text-white hover:opacity-90'
@@ -411,7 +417,7 @@ const selectedTimezoneLabel =
           >
             {saved ? (
               <>
-                <Check size={15} /> {t('settings.saved')}
+                <Check size={13} /> {t('settings.saved')}
               </>
             ) : (
               t('settings.save')
@@ -420,35 +426,42 @@ const selectedTimezoneLabel =
         )}
       </div>
 
-      <div className="grid grid-cols-4 gap-5">
-        <div className={`col-span-1 ${cardClass} p-3 space-y-1 h-fit`}>
-          {navItems.map(item => (
-            <NavItem
-              key={item.id}
-              icon={item.icon}
-              label={item.label}
-              active={activeSection === item.id}
-              onClick={() => setActiveSection(item.id)}
-              dark={dark}
-            />
-          ))}
+      {/* Layout: stack on mobile, sidebar+content on md+ */}
+      <div className="flex flex-col md:grid md:grid-cols-4 gap-4">
+
+        {/* Nav — horizontal scroll on mobile, vertical sidebar on md+ */}
+        <div className={`md:col-span-1 ${cardClass} p-2 md:p-3`}>
+          <div className="flex md:flex-col gap-1 overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
+            {navItems.map(item => (
+              <NavItem
+                key={item.id}
+                icon={item.icon}
+                label={item.label}
+                active={activeSection === item.id}
+                onClick={() => setActiveSection(item.id)}
+                dark={dark}
+              />
+            ))}
+          </div>
         </div>
 
-        <div className="col-span-3 space-y-4">
+        {/* Content */}
+        <div className="md:col-span-3 space-y-4">
+          {/* General */}
           {activeSection === 'general' && (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`${cardClass} p-5`}
+              className={`${cardClass} p-4`}
             >
-              <div className={`flex items-center gap-2 mb-4 pb-3 border-b ${dividerClass}`}>
-                <Monitor size={16} className="text-cyan-400" />
-                <h2 className={`font-semibold text-sm ${headingText}`}>
+              <div className={`flex items-center gap-2 mb-3 pb-3 border-b ${dividerClass}`}>
+                <Monitor size={14} className="text-cyan-400" />
+                <h2 className={`font-semibold text-xs ${headingText}`}>
                   {t('settings.general')}
                 </h2>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <SettingRow
                   icon={dark ? Moon : Sun}
                   label={t('settings.darkMode')}
@@ -494,20 +507,21 @@ const selectedTimezoneLabel =
             </motion.div>
           )}
 
+          {/* Notifications */}
           {activeSection === 'notifications' && (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`${cardClass} p-5`}
+              className={`${cardClass} p-4`}
             >
-              <div className={`flex items-center gap-2 mb-4 pb-3 border-b ${dividerClass}`}>
-                <Bell size={16} className="text-rose-400" />
-                <h2 className={`font-semibold text-sm ${headingText}`}>
+              <div className={`flex items-center gap-2 mb-3 pb-3 border-b ${dividerClass}`}>
+                <Bell size={14} className="text-rose-400" />
+                <h2 className={`font-semibold text-xs ${headingText}`}>
                   {t('settings.notifications')}
                 </h2>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <SettingRow
                   icon={Bell}
                   label={t('settings.pushNotif')}
@@ -544,15 +558,16 @@ const selectedTimezoneLabel =
             </motion.div>
           )}
 
+          {/* Security */}
           {activeSection === 'security' && (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`${cardClass} p-5`}
+              className={`${cardClass} p-4`}
             >
-              <div className={`flex items-center gap-2 mb-4 pb-3 border-b ${dividerClass}`}>
-                <Shield size={16} className="text-emerald-400" />
-                <h2 className={`font-semibold text-sm ${headingText}`}>
+              <div className={`flex items-center gap-2 mb-3 pb-3 border-b ${dividerClass}`}>
+                <Shield size={14} className="text-emerald-400" />
+                <h2 className={`font-semibold text-xs ${headingText}`}>
                   {t('settings.security')}
                 </h2>
               </div>
@@ -591,31 +606,33 @@ const selectedTimezoneLabel =
                 <button
                   type="submit"
                   disabled={pwLoading}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-500 to-rose-500 text-white font-medium rounded-lg text-sm hover:opacity-90 active:scale-95 transition-all disabled:opacity-60"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-500 to-rose-500 text-white font-medium rounded-lg text-xs hover:opacity-90 active:scale-95 transition-all disabled:opacity-60"
                 >
-                  {pwLoading ? <Loader2 size={15} className="animate-spin" /> : <Lock size={15} />}
+                  {pwLoading ? <Loader2 size={14} className="animate-spin" /> : <Lock size={14} />}
                   {pwLoading ? t('settings.changing') : t('settings.changePassword')}
                 </button>
               </form>
             </motion.div>
           )}
 
+          {/* Profile */}
           {activeSection === 'profile' && (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`${cardClass} p-5`}
+              className={`${cardClass} p-4`}
             >
-              <div className={`flex items-center gap-2 mb-4 pb-3 border-b ${dividerClass}`}>
-                <User size={16} className="text-cyan-400" />
-                <h2 className={`font-semibold text-sm ${headingText}`}>
+              <div className={`flex items-center gap-2 mb-3 pb-3 border-b ${dividerClass}`}>
+                <User size={14} className="text-cyan-400" />
+                <h2 className={`font-semibold text-xs ${headingText}`}>
                   {t('settings.profile')}
                 </h2>
               </div>
 
-              <div className="flex items-center gap-5 mb-6">
+              {/* Avatar + Info */}
+              <div className="flex items-center gap-4 mb-5">
                 <div className="relative flex-shrink-0">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-white text-2xl font-bold shadow-xl overflow-hidden">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-white text-xl font-bold shadow-xl overflow-hidden">
                     {avatarPreview ? (
                       <img src={avatarPreview} className="w-full h-full object-cover" alt="avatar" />
                     ) : (
@@ -634,25 +651,26 @@ const selectedTimezoneLabel =
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className={`absolute -bottom-2 -right-2 w-7 h-7 border rounded-lg flex items-center justify-center transition-all ${
+                    className={`absolute -bottom-2 -right-2 w-6 h-6 border rounded-lg flex items-center justify-center transition-all ${
                       dark
                         ? 'bg-[#1a2236] border-white/10 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/40'
                         : 'bg-white border-slate-300 text-slate-600 hover:text-cyan-600 hover:border-cyan-500/50'
                     }`}
                   >
-                    <Camera size={12} />
+                    <Camera size={11} />
                   </button>
                 </div>
 
-                <div>
-                  <h3 className={`text-lg font-bold ${headingText}`}>{user?.name}</h3>
+                <div className="min-w-0">
+                  <h3 className={`text-sm font-bold truncate ${headingText}`}>{user?.name}</h3>
 
-                  <p className={`text-sm flex items-center gap-1.5 mt-0.5 ${mutedText}`}>
-                    <Mail size={13} /> {user?.email}
+                  <p className={`text-xs flex items-center gap-1 mt-0.5 ${mutedText}`}>
+                    <Mail size={11} />
+                    <span className="truncate">{user?.email}</span>
                   </p>
 
                   <span
-                    className={`inline-block mt-1.5 px-2 py-0.5 text-xs rounded-full font-medium ${
+                    className={`inline-block mt-1 px-2 py-0.5 text-xs rounded-full font-medium ${
                       user?.role === 'admin'
                         ? 'bg-violet-500/20 text-violet-500 border border-violet-500/30'
                         : 'bg-cyan-500/20 text-cyan-500 border border-cyan-500/30'
@@ -662,7 +680,7 @@ const selectedTimezoneLabel =
                   </span>
 
                   {avatarFile && (
-                    <p className="text-cyan-500 text-xs mt-1">📎 {avatarFile.name}</p>
+                    <p className="text-cyan-500 text-xs mt-1 truncate">📎 {avatarFile.name}</p>
                   )}
                 </div>
               </div>
@@ -684,14 +702,14 @@ const selectedTimezoneLabel =
 
                 <div>
                   <label className={`block text-xs font-medium mb-1.5 flex items-center gap-1.5 ${mutedText}`}>
-                    <Clock size={13} /> {t('settings.workingHours')}
+                    <Clock size={12} /> {t('settings.workingHours')}
                   </label>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <p className={`text-xs mb-1 ${faintText}`}>{t('settings.start')}</p>
                       <div
-                        className={`flex items-center border rounded-lg px-4 py-2.5 ${
+                        className={`flex items-center border rounded-lg px-3 py-2.5 ${
                           dark ? 'bg-white/5 border-white/10' : 'bg-white border-slate-300'
                         }`}
                       >
@@ -699,7 +717,7 @@ const selectedTimezoneLabel =
                           type="time"
                           value={workStart}
                           onChange={e => setWorkStart(e.target.value)}
-                          className={`flex-1 bg-transparent text-sm outline-none ${inputText}`}
+                          className={`flex-1 bg-transparent text-xs outline-none ${inputText}`}
                         />
                       </div>
                     </div>
@@ -707,7 +725,7 @@ const selectedTimezoneLabel =
                     <div>
                       <p className={`text-xs mb-1 ${faintText}`}>{t('settings.end')}</p>
                       <div
-                        className={`flex items-center border rounded-lg px-4 py-2.5 ${
+                        className={`flex items-center border rounded-lg px-3 py-2.5 ${
                           dark ? 'bg-white/5 border-white/10' : 'bg-white border-slate-300'
                         }`}
                       >
@@ -715,7 +733,7 @@ const selectedTimezoneLabel =
                           type="time"
                           value={workEnd}
                           onChange={e => setWorkEnd(e.target.value)}
-                          className={`flex-1 bg-transparent text-sm outline-none ${inputText}`}
+                          className={`flex-1 bg-transparent text-xs outline-none ${inputText}`}
                         />
                       </div>
                     </div>
@@ -725,27 +743,28 @@ const selectedTimezoneLabel =
                 <button
                   type="submit"
                   disabled={profileLoading}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-violet-500 text-white font-medium rounded-lg text-sm hover:opacity-90 active:scale-95 transition-all disabled:opacity-60"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-violet-500 text-white font-medium rounded-lg text-xs hover:opacity-90 active:scale-95 transition-all disabled:opacity-60"
                 >
-                  {profileLoading ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
+                  {profileLoading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                   {profileLoading ? t('settings.saving') : t('settings.saveProfile')}
                 </button>
               </form>
             </motion.div>
           )}
 
+          {/* Info bar */}
           {activeSection !== 'profile' && activeSection !== 'security' && (
-            <div className={`${cardClass} p-4 flex items-center gap-3 border-l-2 border-cyan-500`}>
-              <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                <Globe size={15} className="text-cyan-400" />
+            <div className={`${cardClass} p-3 flex items-center gap-3 border-l-2 border-cyan-500`}>
+              <div className="w-7 h-7 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                <Globe size={13} className="text-cyan-400" />
               </div>
 
-              <div>
-                <p className={`text-xs font-medium ${bodyText}`}>
+              <div className="min-w-0">
+                <p className={`text-xs font-medium truncate ${bodyText}`}>
                   {t('settings.currentTimezone')}: {selectedTimezoneLabel}
                 </p>
 
-                <p className={`text-xs ${softText}`}>
+                <p className={`text-xs truncate ${softText}`}>
                   {`${t('settings.languageLabel')}: ${
                     language === 'vi' ? t('settings.vi') : t('settings.en')
                   } • ${t('settings.theme')}: ${dark ? t('settings.dark') : t('settings.light')}`}
