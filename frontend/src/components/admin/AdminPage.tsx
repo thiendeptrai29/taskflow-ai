@@ -127,7 +127,7 @@ export default function AdminPage() {
 
       {/* Stats */}
       {stats && (
-        <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
           <StatCard
             label={t('admin.totalUsers')}
             value={stats.totalUsers}
@@ -163,13 +163,13 @@ export default function AdminPage() {
 
       {/* Users table */}
       <div className="glass rounded-2xl overflow-hidden">
-        <div className="p-5 border-b border-white/5 flex items-center justify-between">
-          <h3 className="font-semibold text-white flex items-center gap-2">
-            <Users size={16} className="text-cyan-400" />
-            {t('admin.userList')}
+        <div className="p-3 md:p-5 border-b border-white/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <h3 className="font-semibold text-sm md:text-base text-white flex items-center gap-2">
+            <Users size={16} className="text-cyan-400 flex-shrink-0" />
+            <span className="truncate">{t('admin.userList')}</span>
           </h3>
 
-          <div className="relative">
+          <div className="relative w-full sm:w-64">
             <Search
               size={14}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
@@ -178,27 +178,27 @@ export default function AdminPage() {
               value={search}
               onChange={event => setSearch(event.target.value)}
               style={{ paddingLeft: '2rem' }}
-              className="input-dark w-64 text-xs"
+              className="input-dark w-full text-xs"
               placeholder={t('admin.searchPlaceholder')}
             />
           </div>
         </div>
 
         {loading ? (
-          <div className="p-5 space-y-3">
+          <div className="p-3 md:p-5 space-y-3">
             {[...Array(5)].map((_, index) => (
               <div key={index} className="h-12 skeleton rounded-lg" />
             ))}
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-max text-xs md:text-sm">
               <thead>
                 <tr className="border-b border-white/5">
                   {tableHeaders.map(header => (
                     <th
                       key={header}
-                      className="text-left px-5 py-3 text-xs font-semibold text-slate-500"
+                      className="text-left px-3 md:px-5 py-2 md:py-3 text-xs font-semibold text-slate-500 whitespace-nowrap"
                     >
                       {header}
                     </th>
@@ -218,24 +218,24 @@ export default function AdminPage() {
                       transition={{ delay: index * 0.04 }}
                       className="border-b border-white/3 hover:bg-white/2 transition-colors"
                     >
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-white text-xs font-bold">
+                      <td className="px-3 md:px-5 py-2 md:py-3">
+                        <div className="flex items-center gap-2 md:gap-3">
+                          <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                             {user.name[0].toUpperCase()}
                           </div>
-                          <span className="text-slate-200 text-sm font-medium">
+                          <span className="text-slate-200 text-xs md:text-sm font-medium truncate max-w-[120px] md:max-w-none">
                             {user.name}
                           </span>
                         </div>
                       </td>
 
-                      <td className="px-5 py-3 text-slate-400 text-sm">
+                      <td className="px-3 md:px-5 py-2 md:py-3 text-slate-400 text-xs md:text-sm truncate max-w-[150px] md:max-w-none">
                         {user.email}
                       </td>
 
-                      <td className="px-5 py-3">
+                      <td className="px-3 md:px-5 py-2 md:py-3">
                         <span
-                          className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          className={`px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
                             user.role === 'admin'
                               ? 'bg-violet-500/20 text-violet-400 border border-violet-500/30'
                               : 'bg-slate-500/20 text-slate-400 border border-slate-500/30'
@@ -247,15 +247,15 @@ export default function AdminPage() {
                         </span>
                       </td>
 
-                      <td className="px-5 py-3 text-slate-500 text-sm">
+                      <td className="px-3 md:px-5 py-2 md:py-3 text-slate-500 text-xs md:text-sm whitespace-nowrap">
                         {user.createdAt
                           ? format(new Date(user.createdAt), 'dd/MM/yyyy', { locale: dateLocale })
                           : '—'}
                       </td>
 
-                      <td className="px-5 py-3">
+                      <td className="px-3 md:px-5 py-2 md:py-3">
                         <span
-                          className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          className={`px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
                             isActive
                               ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                               : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
@@ -265,12 +265,12 @@ export default function AdminPage() {
                         </span>
                       </td>
 
-                      <td className="px-5 py-3">
+                      <td className="px-3 md:px-5 py-2 md:py-3">
                         {user.role !== 'admin' && (
                           <button
                             onClick={() => handleToggle(user.id, user.name)}
                             disabled={toggling === user.id}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                            className={`flex items-center gap-1 px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                               isActive
                                 ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20'
                                 : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20'
@@ -284,7 +284,7 @@ export default function AdminPage() {
                               <ToggleRight size={14} />
                             )}
 
-                            {isActive ? t('admin.lock') : t('admin.unlock')}
+                            <span className="hidden md:inline">{isActive ? t('admin.lock') : t('admin.unlock')}</span>
                           </button>
                         )}
                       </td>

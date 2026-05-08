@@ -319,26 +319,26 @@ export default function AIPage() {
   };
 
   return (
-    <div className="space-y-5 animate-fade-in h-[calc(100vh-8rem)] flex flex-col">
+    <div className="space-y-4 md:space-y-5 animate-fade-in h-[calc(100vh-8rem)] flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center shadow-lg animate-float">
-            <Sparkles size={20} className="text-white" />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 flex-shrink-0">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center shadow-lg animate-float flex-shrink-0">
+            <Sparkles size={18} className="md:size-5 text-white" />
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-white">AI Assistant</h1>
-            <p className="text-slate-400 text-xs">Powered by Groq • Llama 3.1</p>
+          <div className="min-w-0">
+            <h1 className="text-lg md:text-xl font-bold text-white truncate">AI Assistant</h1>
+            <p className="text-slate-400 text-xs truncate">Powered by Groq • Llama 3.1</p>
           </div>
         </div>
 
         {activeTab === 'chat' && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0 overflow-x-auto">
             <button
               onClick={createNewSession}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white text-xs transition-all"
+              className="flex items-center gap-1.5 px-2 md:px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white text-xs transition-all whitespace-nowrap"
             >
-              <Plus size={13} /> {t('ai.new')}
+              <Plus size={13} /> <span className="hidden md:inline">{t('ai.new')}</span><span className="md:hidden">+</span>
             </button>
 
             <button
@@ -346,9 +346,9 @@ export default function AIPage() {
                 setShowSessions(!showSessions);
                 loadSessions();
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white text-xs transition-all"
+              className="flex items-center gap-1.5 px-2 md:px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white text-xs transition-all whitespace-nowrap"
             >
-              <MessageSquare size={13} /> {t('ai.history')} ({sessions.length})
+              <MessageSquare size={13} /> <span className="hidden md:inline">{t('ai.history')} ({sessions.length})</span><span className="md:hidden">({sessions.length})</span>
             </button>
           </div>
         )}
@@ -432,7 +432,7 @@ export default function AIPage() {
           <button
             key={id}
             onClick={() => setActiveTab(id)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 ${
+            className={`flex items-center gap-1.5 px-2.5 md:px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 ${
               activeTab === id
                 ? 'bg-gradient-to-r from-cyan-500/20 to-violet-500/20 text-cyan-400 border border-cyan-500/20'
                 : 'text-slate-400 hover:text-slate-200'

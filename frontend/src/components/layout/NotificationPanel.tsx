@@ -62,23 +62,26 @@ export default function NotificationPanel({
       <motion.div
         initial={{ x: 400, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 400, opacity: 0 }}
         transition={{ type: 'spring', damping: 25 }}
-        className="fixed right-0 top-0 bottom-0 w-96 bg-dark-800 border-l border-white/5 z-40 flex flex-col"
+        className="fixed right-0 top-0 bottom-0 w-full sm:w-96 bg-dark-800 border-l border-white/5 z-40 flex flex-col"
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-          <div className="flex items-center gap-2">
-            <Bell size={16} className="text-cyan-400" />
-            <h3 className="font-semibold text-slate-200 text-sm">Thông báo</h3>
+        <div className="flex items-center justify-between gap-2 px-4 sm:px-5 py-4 border-b border-white/5">
+          <div className="flex items-center gap-2 min-w-0">
+            <Bell size={16} className="text-cyan-400 flex-shrink-0" />
+            <h3 className="font-semibold text-slate-200 text-xs sm:text-sm truncate">Thông báo</h3>
             {notifications.filter(n => !n.isRead).length > 0 && (
-              <span className="px-1.5 py-0.5 bg-rose-500 text-white text-xs rounded-full font-medium">
+              <span className="px-1.5 py-0.5 bg-rose-500 text-white text-xs rounded-full font-medium flex-shrink-0">
                 {notifications.filter(n => !n.isRead).length}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <button onClick={markAllRead} className="text-slate-500 hover:text-slate-300 text-xs flex items-center gap-1 transition-colors">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button onClick={markAllRead} className="text-slate-500 hover:text-slate-300 text-xs flex items-center gap-1 transition-colors hidden sm:flex">
               <CheckCheck size={14} /> Đọc tất cả
             </button>
-            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5 text-slate-400 hover:text-slate-200 transition-all">
+            <button onClick={markAllRead} className="text-slate-500 hover:text-slate-300 text-xs flex items-center gap-1 transition-colors sm:hidden" title="Mark all read">
+              <CheckCheck size={14} />
+            </button>
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5 text-slate-400 hover:text-slate-200 transition-all flex-shrink-0">
               <X size={16} />
             </button>
           </div>
@@ -86,7 +89,7 @@ export default function NotificationPanel({
 
         <div className="flex-1 overflow-y-auto">
           {loading ? (
-            <div className="space-y-3 p-4">
+            <div className="space-y-3 p-3 sm:p-4">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="h-16 skeleton rounded-xl" />
               ))}
@@ -97,7 +100,7 @@ export default function NotificationPanel({
               <p className="text-sm">Không có thông báo nào</p>
             </div>
           ) : (
-            <div className="p-4 space-y-2">
+            <div className="p-3 sm:p-4 space-y-2">
               {notifications.map(n => (
                 <div key={n._id} className={`glass rounded-xl p-4 relative group transition-all ${!n.isRead ? 'border-l-2 border-l-cyan-500' : ''}`}>
                   <div className="flex items-start gap-3">

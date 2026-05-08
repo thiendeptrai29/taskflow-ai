@@ -2,12 +2,27 @@ import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
-  CheckCircle2, Clock, AlertTriangle, TrendingUp,
-  Sparkles, Plus, ArrowRight, Zap, Target, RefreshCw
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
+  TrendingUp,
+  Sparkles,
+  Plus,
+  ArrowRight,
+  Zap,
+  Target,
+  RefreshCw,
 } from 'lucide-react';
 import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
 } from 'recharts';
 import { statsAPI, taskAPI } from '../../services/api';
 import { Stats, Task } from '../../types';
@@ -24,15 +39,32 @@ const PRIORITY_COLORS: Record<string, string> = {
 };
 
 const StatCard = ({ icon: Icon, label, value, color, sub }: any) => (
-  <motion.div whileHover={{ y: -2 }} className="glass glass-hover rounded-2xl p-4">
-    <div className="flex items-start justify-between mb-3">
-      <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${color}`}>
+  <motion.div
+    whileHover={{ y: -2 }}
+    className="glass glass-hover rounded-2xl p-3 md:p-4 border border-white/[0.05]"
+  >
+    <div className="flex items-center gap-3">
+      <div
+        className={`w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center ${color} shadow-lg flex-shrink-0`}
+      >
         <Icon size={16} className="text-white" />
       </div>
+
+      <div className="min-w-0">
+        <p className="text-xl md:text-2xl font-extrabold text-white leading-none">
+          {value}
+        </p>
+        <p className="text-slate-400 text-[11px] md:text-xs mt-1 truncate">
+          {label}
+        </p>
+      </div>
     </div>
-    <p className="text-2xl font-bold text-white mb-0.5">{value}</p>
-    <p className="text-slate-400 text-xs">{label}</p>
-    {sub && <p className="text-xs text-slate-600 mt-1">{sub}</p>}
+
+    {sub && (
+      <p className="text-[10px] md:text-xs text-slate-600 mt-2 pl-12 md:pl-13 truncate">
+        {sub}
+      </p>
+    )}
   </motion.div>
 );
 
@@ -129,13 +161,12 @@ export default function DashboardPage() {
     return (
       <div className="space-y-4 animate-fade-in">
         <div className="h-6 skeleton rounded-lg w-48" />
-        {/* Fixed: 2 cols on mobile */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
           {[...Array(4)].map((_, index) => (
-            <div key={index} className="h-28 skeleton rounded-2xl" />
+            <div key={index} className="h-20 md:h-28 skeleton rounded-2xl" />
           ))}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
           <div className="h-48 skeleton rounded-2xl" />
           <div className="h-48 skeleton rounded-2xl" />
         </div>
@@ -144,43 +175,46 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-4 animate-fade-in">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold text-white">
-            {greeting()},{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">
-              {user?.name?.split(' ').pop()} 👋
-            </span>
-          </h1>
-          <p className="text-slate-400 text-xs mt-1 capitalize">
-            {format(new Date(), 'EEEE, d MMMM yyyy', { locale: dateLocale })}
-          </p>
-        </div>
+    <div className="space-y-4 md:space-y-5 animate-fade-in">
+      <div className="space-y-3">
+        <div className="flex items-start justify-between gap-3">
+  <div className="min-w-0">
+    <h1 className="text-lg md:text-xl font-extrabold text-white leading-tight">
+      {greeting()},{' '}
+      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">
+        {user?.name?.split(' ').pop()} 👋
+      </span>
+    </h1>
+    <p className="text-slate-400 text-[11px] md:text-xs mt-1 capitalize truncate">
+      {format(new Date(), 'EEEE, d MMMM yyyy', { locale: dateLocale })}
+    </p>
+  </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => load(true)}
-            disabled={refreshing}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all"
-            title={t('dashboard.refresh')}
-          >
-            <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
-          </button>
+  <div className="flex items-center gap-2 flex-shrink-0">
+    <Link
+      to="/tasks"
+      className="h-10 inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-500 px-3 text-white text-[11px] md:text-sm font-extrabold shadow-lg shadow-cyan-500/10 hover:opacity-90 active:scale-[0.98] transition-all whitespace-nowrap"
+    >
+      <Plus size={14} className="flex-shrink-0" />
+      <span className="hidden min-[390px]:inline">{t('dashboard.createTask')}</span>
+      <span className="min-[390px]:hidden">Tạo</span>
+    </Link>
 
-          <Link
-            to="/tasks"
-            className="btn-primary flex items-center gap-1.5 text-xs px-3 py-2"
-          >
-            <Plus size={14} />
-            <span>{t('dashboard.createTask')}</span>
-          </Link>
-        </div>
+    <button
+      type="button"
+      onClick={() => load(true)}
+      disabled={refreshing}
+      className="h-10 w-10 rounded-xl border border-white/10 bg-white/[0.04] text-slate-400 hover:text-white hover:bg-white/[0.08] active:scale-95 transition-all flex items-center justify-center flex-shrink-0"
+      title={t('dashboard.refresh')}
+    >
+      <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+    </button>
+  </div>
+</div>
+
       </div>
 
-      {/* Stat Cards — 2 cols on mobile, 4 on desktop */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
         <StatCard
           icon={Target}
           label={t('dashboard.totalTasks')}
@@ -208,18 +242,16 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Charts — stack on mobile */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Area Chart */}
-        <div className="lg:col-span-2 glass rounded-2xl p-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
+        <div className="lg:col-span-2 glass rounded-2xl p-4 border border-white/[0.05]">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-white text-xs flex items-center gap-2">
+            <h3 className="font-bold text-white text-xs flex items-center gap-2">
               <TrendingUp size={14} className="text-cyan-400" />
               {t('dashboard.last7Days')}
             </h3>
           </div>
 
-          <ResponsiveContainer width="100%" height={150}>
+          <ResponsiveContainer width="100%" height={170}>
             <AreaChart data={stats?.dailyStats ?? []}>
               <defs>
                 <linearGradient id="colorCreated" x1="0" y1="0" x2="0" y2="1">
@@ -234,15 +266,15 @@ export default function DashboardPage() {
 
               <XAxis
                 dataKey="date"
-                tick={{ fill: dark ? '#475569' : '#64748b', fontSize: 9 }}
+                tick={{ fill: dark ? '#64748b' : '#64748b', fontSize: 9 }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fill: dark ? '#475569' : '#64748b', fontSize: 9 }}
+                tick={{ fill: dark ? '#64748b' : '#64748b', fontSize: 9 }}
                 axisLine={false}
                 tickLine={false}
-                width={20}
+                width={22}
               />
               <Tooltip
                 contentStyle={tooltipStyle}
@@ -270,16 +302,15 @@ export default function DashboardPage() {
           </ResponsiveContainer>
         </div>
 
-        {/* Pie Chart */}
-        <div className="glass rounded-2xl p-4">
-          <h3 className="font-semibold text-white text-xs mb-4 flex items-center gap-2">
+        <div className="glass rounded-2xl p-4 border border-white/[0.05]">
+          <h3 className="font-bold text-white text-xs mb-4 flex items-center gap-2">
             <Zap size={14} className="text-amber-400" />
             {t('dashboard.byPriority')}
           </h3>
 
           {priorityChartData.length > 0 ? (
             <>
-              <ResponsiveContainer width="100%" height={120}>
+              <ResponsiveContainer width="100%" height={140}>
                 <PieChart>
                   <Pie
                     data={priorityChartData}
@@ -287,8 +318,8 @@ export default function DashboardPage() {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    innerRadius={30}
-                    outerRadius={50}
+                    innerRadius={34}
+                    outerRadius={56}
                   >
                     {priorityChartData.map(entry => (
                       <Cell key={entry.key} fill={PRIORITY_COLORS[entry.key] || '#475569'} />
@@ -305,15 +336,17 @@ export default function DashboardPage() {
 
               <div className="space-y-1.5 mt-2">
                 {priorityChartData.map(item => (
-                  <div key={item.key} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
+                  <div key={item.key} className="flex items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-2 min-w-0">
                       <span
                         className="w-2 h-2 rounded-full flex-shrink-0"
                         style={{ background: PRIORITY_COLORS[item.key] }}
                       />
                       <span className="text-slate-400 truncate">{item.name}</span>
                     </div>
-                    <span className="font-semibold text-slate-200 flex-shrink-0">{item.count}</span>
+                    <span className="font-semibold text-slate-200 flex-shrink-0">
+                      {item.count}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -326,10 +359,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Upcoming Tasks */}
-      <div className="glass rounded-2xl p-4">
+      <div className="glass rounded-2xl p-4 border border-white/[0.05]">
         <div className="flex items-center justify-between mb-4 gap-2">
-          <h3 className="font-semibold text-white text-xs flex items-center gap-2 flex-shrink-0">
+          <h3 className="font-bold text-white text-xs flex items-center gap-2 flex-shrink-0">
             <Clock size={14} className="text-violet-400 flex-shrink-0" />
             <span>{t('dashboard.upcoming')}</span>
           </h3>
@@ -353,7 +385,7 @@ export default function DashboardPage() {
               <motion.div
                 key={task._id}
                 whileHover={{ x: 2 }}
-                className="flex items-center gap-3 p-3 rounded-xl bg-white/3 hover:bg-white/5 transition-all"
+                className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-all"
               >
                 <div
                   className={`w-2 h-2 rounded-full flex-shrink-0 ${
@@ -384,7 +416,6 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* AI Banner */}
       <Link to="/ai">
         <motion.div
           whileHover={{ scale: 1.01 }}

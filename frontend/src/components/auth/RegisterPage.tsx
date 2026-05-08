@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 export default function RegisterPage() {
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [showPass, setShowPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const { register } = useAuthStore();
   const navigate = useNavigate();
@@ -80,20 +81,20 @@ export default function RegisterPage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.5 }}
-          style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.75rem', justifyContent: 'center' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: 'clamp(1rem, 5vw, 1.75rem)', justifyContent: 'center' }}
         >
           <div style={{
-            width: 52, height: 52, borderRadius: '16px',
+            width: 'clamp(44px, 10vw, 52px)', height: 'clamp(44px, 10vw, 52px)', borderRadius: '16px',
             background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 0 30px rgba(139,92,246,0.4), 0 0 60px rgba(6,182,212,0.2)',
             animation: 'floatLogo 4s ease-in-out infinite',
           }}>
-            <Sparkles size={26} color="white" />
+            <Sparkles size={20} className="sm:size-6" color="white" />
           </div>
           <div>
             <h1 style={{
-              fontSize: '1.6rem', fontWeight: 800, margin: 0, lineHeight: 1.1,
+              fontSize: 'clamp(1.2rem, 5vw, 1.6rem)', fontWeight: 800, margin: 0, lineHeight: 1.1,
               background: 'linear-gradient(135deg, #e2e8f0, #94a3b8)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
             }}>TaskFlow AI</h1>
@@ -115,7 +116,7 @@ export default function RegisterPage() {
             backdropFilter: 'blur(24px)',
             border: '1px solid rgba(255,255,255,0.08)',
             borderRadius: '1.5rem',
-            padding: '2rem',
+            padding: 'clamp(1.25rem, 5vw, 2rem)',
             boxShadow: '0 25px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
             position: 'relative', overflow: 'hidden',
           }}
@@ -127,10 +128,10 @@ export default function RegisterPage() {
           }} />
 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}>
-            <h2 style={{ color: '#f1f5f9', fontWeight: 700, fontSize: '1.2rem', margin: '0 0 0.25rem' }}>
+            <h2 style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 'clamp(1rem, 4vw, 1.2rem)', margin: '0 0 0.25rem' }}>
               Tạo tài khoản ✨
             </h2>
-            <p style={{ color: '#64748b', fontSize: '0.82rem', margin: '0 0 1.5rem' }}>
+            <p style={{ color: '#64748b', fontSize: 'clamp(0.75rem, 2.5vw, 0.82rem)', margin: '0 0 1.5rem' }}>
               Bắt đầu quản lý công việc thông minh ngay hôm nay
             </p>
           </motion.div>
@@ -185,8 +186,8 @@ export default function RegisterPage() {
                   onChange={e => setForm({ ...form, password: e.target.value })}
                   placeholder="••••••••"
                   style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: '#e2e8f0', fontSize: '0.875rem' }} />
-                <button type="button"tabIndex={-1} onClick={() => setShowPass(!showPass)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#475569', padding: 0, display: 'flex' }}
+                <button type="button" tabIndex={-1} onClick={() => setShowPass(!showPass)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#475569', padding: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'color 0.2s' }}
                   onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
                   onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
                   {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
@@ -205,10 +206,16 @@ export default function RegisterPage() {
                 borderRadius: '0.75rem', padding: '0.75rem 1rem', transition: 'all 0.2s ease',
               }}>
                 <Lock size={15} color="#475569" style={{ flexShrink: 0 }} />
-                <input type={showPass ? 'text' : 'password'} value={form.confirmPassword}
+                <input type={showConfirmPass ? 'text' : 'password'} value={form.confirmPassword}
                   onChange={e => setForm({ ...form, confirmPassword: e.target.value })}
                   placeholder="••••••••"
                   style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: '#e2e8f0', fontSize: '0.875rem' }} />
+                <button type="button" tabIndex={-1} onClick={() => setShowConfirmPass(!showConfirmPass)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#475569', padding: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'color 0.2s' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
+                  onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+                  {showConfirmPass ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
               </div>
             </motion.div>
 
