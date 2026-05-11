@@ -1,7 +1,7 @@
 # 🚀 TaskFlow AI — Ứng dụng Quản lý Công việc Thông minh
 
 > Ứng dụng quản lý công việc cá nhân tích hợp AI, xây dựng với React + TypeScript + Node.js + MongoDB + Groq
-
+🌐 **Demo Website:** https://taskflow-ai-wheat.vercel.app/
 ---
 
 ## 📁 Cấu trúc Thư mục
@@ -20,7 +20,7 @@ taskflow-ai/
 │   │   │   ├── adminController.js
 │   │   │   ├── aiController.js      # AI features
 │   │   │   ├── authController.js    # Auth logic
-│   │   │   ├── Chatcontroller.js    # Chat/messages
+│   │   │   ├── chatController.js    # Chat/messages
 │   │   │   ├── notificationController.js
 │   │   │   ├── statsController.js
 │   │   │   ├── taskController.js
@@ -30,7 +30,7 @@ taskflow-ai/
 │   │   ├── models/                   # Database schemas
 │   │   │   ├── User.js
 │   │   │   ├── Task.js
-│   │   │   ├── Chathistory.js
+│   │   │   ├── ChatHistory.js
 │   │   │   ├── Notification.js
 │   │   │   └── Team.js              # Team schema
 │   │   └── routes/                   # API endpoints
@@ -77,6 +77,7 @@ taskflow-ai/
 │   │   │   │   └── TasksPage.tsx
 │   │   │   └── team/
 │   │   │       ├── InviteMemberModal.tsx
+│   │   │       ├── InviteNotificationBanner.tsx
 │   │   │       ├── TeamCard.tsx
 │   │   │       ├── TeamDetailPage.tsx
 │   │   │       ├── TeamModal.tsx
@@ -193,7 +194,11 @@ cd backend
 npm install
 
 # Tạo file .env
-# Cần: MONGODB_URI, JWT_SECRET, GROK_API_KEY, PORT
+PORT=5000
+MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_secret_key
+GROQ_API_KEY=your_groq_api_key
+CLIENT_URL=http://localhost:5173
 
 # Tạo thư mục uploads
 mkdir uploads
