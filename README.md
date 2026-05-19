@@ -1,6 +1,6 @@
 # 🚀 TaskFlow AI — Ứng dụng Quản lý Công việc Thông minh
 
-> Ứng dụng quản lý công việc cá nhân tích hợp AI, xây dựng với React + TypeScript + Node.js + MongoDB + Groq
+> Ứng dụng quản lý công việc  tích hợp AI, xây dựng với React + TypeScript + Node.js + MongoDB + Groq
 🌐 **Demo Website:** https://taskflow-ai-wheat.vercel.app/
 ---
 
@@ -137,7 +137,7 @@ taskflow-ai/
 | **Tạo task từ text** | Nhập văn bản → AI phân loại & điền form |
 | **Voice input** | Nhận giọng nói tiếng Việt (Web Speech API) |
 
-### 👥 Quản lý Team (trong phát triển)
+### 👥 Quản lý Team 
 - Tạo & quản lý team
 - Mời thành viên
 - Chia sẻ task trong team
@@ -181,7 +181,7 @@ taskflow-ai/
 ### 1. Clone Repository
 
 ```bash
-git clone <repository-url>
+git clone <https://github.com/thiendeptrai29/taskflow-ai>
 cd taskflow-ai
 ```
 
@@ -331,5 +331,3 @@ VITE_API_BASE_URL=http://localhost:5000
 - [ ] More AI capabilities (GPT-4, Claude)
 
 ---
-
-Made with ❤️ | TaskFlow AI © 2024
