@@ -14,7 +14,20 @@ const getUsers = async (req, res) => {
     if (isActive !== undefined) filter.isActive = isActive === 'true';
 
     const users = await User.find(filter).select('-password').sort('-createdAt');
-    res.json({ success: true, count: users.length, users });
+    
+    // Map _id to id for consistent frontend response
+    const formattedUsers = users.map(user => ({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+      preferences: user.preferences
+    }));
+    
+    res.json({ success: true, count: formattedUsers.length, users: formattedUsers });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -30,6 +43,18 @@ const toggleUserStatus = async (req, res) => {
 
     user.isActive = !user.isActive;
     await user.save();
+
+    // Create notification for user when account is disabled
+    if (!user.isActive) {
+      const Notification = require('../models/Notification');
+      await Notification.create({
+        user: user._id,
+        type: 'system',
+        title: '⛔ Tài khoản đã bị vô hiệu hóa, Vui lòng liên hệ hỗ trợ để được trợ giúp',
+        message: 'Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ hỗ trợ để được trợ giúp.',
+        isRead: false
+      }).catch(err => console.error('Disable notification error:', err));
+    }
 
     res.json({ success: true, message: `Account ${user.isActive ? 'enabled' : 'disabled'}`, user });
   } catch (error) {
