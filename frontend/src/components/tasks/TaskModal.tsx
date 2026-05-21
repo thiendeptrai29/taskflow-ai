@@ -461,7 +461,7 @@ function DeadlinePicker({
         <AnimatePresence>
           {open && (
             <motion.div
-              className="fixed inset-0 z-[10000] flex items-end md:items-center justify-center px-3 py-3 bg-black/75 backdrop-blur-[4px]"
+              className="fixed inset-0 z-[10000] flex items-end md:items-center justify-center px-3 py-3 bg-black/75 backdrop-blur-[4px] overflow-y-auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -472,7 +472,7 @@ function DeadlinePicker({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 24, scale: 0.98 }}
                 transition={{ duration: 0.18 }}
-                className="w-full max-w-[400px] max-h-[calc(100dvh-24px)] overflow-hidden rounded-3xl border border-slate-600/80 bg-slate-900 shadow-2xl shadow-black/70"
+                className="w-full max-w-[400px] max-h-[calc(100dvh-32px)] overflow-y-auto rounded-3xl border border-slate-600/80 bg-slate-900 shadow-2xl shadow-black/70"
               >
                 <div className="px-4 pt-4 pb-3 border-b border-slate-700/80">
                   <div className="flex items-center justify-between mb-3">
