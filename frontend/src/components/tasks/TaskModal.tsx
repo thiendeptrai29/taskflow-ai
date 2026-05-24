@@ -472,7 +472,7 @@ function DeadlinePicker({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 24, scale: 0.98 }}
                 transition={{ duration: 0.18 }}
-                className="w-full max-w-[400px] max-h-[calc(100dvh-32px)] overflow-y-auto rounded-3xl border border-slate-600/80 bg-slate-900 shadow-2xl shadow-black/70"
+                className="w-full max-w-[400px] max-h-[calc(100dvh-32px)] overflow-y-auto rounded-3xl border border-slate-600/80 bg-slate-900 shadow-2xl shadow-black/70 my-auto"
               >
                 <div className="px-4 pt-4 pb-3 border-b border-slate-700/80">
                   <div className="flex items-center justify-between mb-3">
@@ -726,15 +726,17 @@ export default function TaskModal({ task, onClose }: Props) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-end md:items-center justify-center md:p-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm overflow-y-auto"
       onClick={e => e.target === e.currentTarget && onClose()}
     >
+      {/* Inner wrapper căn giữa đúng kể cả khi overflow */}
+      <div className="flex min-h-full items-end md:items-center justify-center md:p-4 pointer-events-none">
       <motion.div
-        initial={{ y: '100%' }}
-        animate={{ y: 0 }}
-        exit={{ y: '100%' }}
-        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="w-full md:max-w-lg glass rounded-t-2xl md:rounded-2xl flex flex-col max-h-[92vh] md:max-h-[90vh]"
+        initial={{ opacity: 0, scale: 0.96, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 20 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        className="w-full md:max-w-lg glass rounded-t-2xl md:rounded-2xl flex flex-col max-h-[92vh] md:max-h-[85vh] pointer-events-auto"
       >
         <div className="flex justify-center pt-2.5 pb-1 md:hidden flex-shrink-0">
           <div className="w-10 h-1 rounded-full bg-white/20" />
@@ -803,7 +805,7 @@ export default function TaskModal({ task, onClose }: Props) {
           )}
         </AnimatePresence>
 
-        <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-3 md:space-y-4 overflow-y-auto flex-1">
+        <form id="task-form" onSubmit={handleSubmit} className="p-4 md:p-6 space-y-3 md:space-y-4 overflow-y-auto flex-1">
           <div>
             <label className="block text-slate-400 text-xs font-medium mb-1.5">
               {t('tasks.title')} *
@@ -875,13 +877,15 @@ export default function TaskModal({ task, onClose }: Props) {
               placeholder={t('tasks.categoryPlaceholder')}
             />
           </div>
+        </form>
 
-          <div className="flex gap-2 md:gap-3 pt-2 sticky bottom-0 bg-transparent pb-1">
+        <div className="flex gap-2 md:gap-3 px-4 md:px-6 pb-4 md:pb-6 pt-3 border-t border-white/5 flex-shrink-0">
             <button type="button" onClick={onClose} className="btn-ghost flex-1 text-xs md:text-sm">
               {t('tasks.cancel')}
             </button>
             <button
               type="submit"
+              form="task-form"
               disabled={loading}
               className="btn-primary flex-1 flex items-center justify-center gap-2 text-xs md:text-sm"
             >
@@ -889,8 +893,8 @@ export default function TaskModal({ task, onClose }: Props) {
               {task ? t('tasks.update') : t('tasks.createTaskSubmit')}
             </button>
           </div>
-        </form>
       </motion.div>
+      </div>
     </motion.div>
   );
 }
