@@ -48,8 +48,6 @@ const Toggle = ({ value, onChange }: { value: boolean; onChange: () => void }) =
   </button>
 );
 
-
-
 const CustomDropdown = ({
   value,
   onChange,
@@ -316,11 +314,13 @@ const InputRow = ({
     {children}
   </div>
 );
+
 const formatTimeLabel = (value: string) => {
   if (!value) return '--:--';
   const [hour, minute] = value.split(':');
   return `${hour}:${minute}`;
 };
+
 let sharedAudioContext: AudioContext | null = null;
 let lastTickAt = 0;
 
@@ -654,7 +654,6 @@ export default function SettingsPage() {
 
   const [timezone, setTimezone] = useState('UTC+7');
   const [activeSection, setActiveSection] = useState('general');
-  const [saved, setSaved] = useState(false);
 
   const [name, setName] = useState(user?.name || '');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -673,7 +672,6 @@ export default function SettingsPage() {
   const bodyText = dark ? 'text-slate-200' : 'text-slate-900';
   const mutedText = dark ? 'text-slate-400' : 'text-slate-600';
   const softText = dark ? 'text-slate-500' : 'text-slate-500';
-  const faintText = dark ? 'text-slate-600' : 'text-slate-500';
   const inputText = dark
     ? 'text-slate-200 placeholder-slate-500'
     : 'text-slate-900 placeholder-slate-400';
@@ -683,11 +681,6 @@ export default function SettingsPage() {
     : 'bg-white/80 border border-slate-200 shadow-sm rounded-2xl';
 
   const dividerClass = dark ? 'border-white/5' : 'border-slate-200';
-
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
 
   const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -786,7 +779,8 @@ export default function SettingsPage() {
 
   return (
     <div className="animate-fade-in space-y-4">
-      <div className="flex items-center justify-between gap-3">
+      {/* Header — đã xóa nút "Lưu thay đổi" */}
+      <div className="flex items-center gap-3">
         <div className="min-w-0">
           <h1 className={`text-xl font-bold flex items-center gap-2 ${titleText}`}>
             ⚙️ {t('settings.title')}
@@ -795,30 +789,10 @@ export default function SettingsPage() {
             {t('settings.subtitle')}
           </p>
         </div>
-
-        {activeSection !== 'profile' && activeSection !== 'security' && (
-          <motion.button
-            type="button"
-            onClick={handleSave}
-            whileTap={{ scale: 0.95 }}
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all flex-shrink-0 ${
-              saved
-                ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
-                : 'bg-gradient-to-r from-cyan-500 to-violet-500 text-white hover:opacity-90'
-            }`}
-          >
-            {saved ? (
-              <>
-                <Check size={13} /> {t('settings.saved')}
-              </>
-            ) : (
-              t('settings.save')
-            )}
-          </motion.button>
-        )}
       </div>
 
       <div className="flex flex-col md:grid md:grid-cols-4 gap-4 overflow-visible">
+        {/* Sidebar nav */}
         <div className={`md:col-span-1 ${cardClass} p-2 md:p-3 self-start`}>
           <div
             className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-0.5 md:pb-0"
@@ -838,6 +812,7 @@ export default function SettingsPage() {
         </div>
 
         <div className="md:col-span-3 space-y-4 overflow-visible">
+          {/* General */}
           {activeSection === 'general' && (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
@@ -897,6 +872,7 @@ export default function SettingsPage() {
             </motion.div>
           )}
 
+          {/* Security */}
           {activeSection === 'security' && (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
@@ -953,130 +929,128 @@ export default function SettingsPage() {
             </motion.div>
           )}
 
-       {activeSection === 'profile' && (
-  <motion.div
-    initial={{ opacity: 0, y: 8 }}
-    animate={{ opacity: 1, y: 0 }}
-    className={`${cardClass} overflow-hidden`}
-  >
-    <div className="relative p-4 border-b border-white/5 bg-gradient-to-r from-cyan-500/10 via-violet-500/10 to-transparent">
-      <div className="flex items-center gap-3">
-        <div className="relative flex-shrink-0">
-  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-white text-2xl font-bold shadow-xl overflow-hidden ring-4 ring-white/5">
-    {avatarPreview ? (
-      <img src={avatarPreview} className="w-full h-full object-cover" alt="avatar" />
-    ) : (
-      <span>{user?.name?.[0]?.toUpperCase()}</span>
-    )}
-  </div>
+          {/* Profile */}
+          {activeSection === 'profile' && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`${cardClass} overflow-hidden`}
+            >
+              <div className="relative p-4 border-b border-white/5 bg-gradient-to-r from-cyan-500/10 via-violet-500/10 to-transparent">
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-shrink-0">
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-white text-2xl font-bold shadow-xl overflow-hidden ring-4 ring-white/5">
+                      {avatarPreview ? (
+                        <img src={avatarPreview} className="w-full h-full object-cover" alt="avatar" />
+                      ) : (
+                        <span>{user?.name?.[0]?.toUpperCase()}</span>
+                      )}
+                    </div>
 
-  <input
-    ref={fileInputRef}
-    type="file"
-    accept="image/*"
-    className="hidden"
-    onChange={handleAvatarChange}
-  />
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarChange}
+                    />
+                  </div>
 
-</div>
+                  <div className="min-w-0 flex-1">
+                    <h2 className={`text-base font-bold truncate ${headingText}`}>
+                      {user?.name}
+                    </h2>
 
-<div className="min-w-0 flex-1">
-  <h2 className={`text-base font-bold truncate ${headingText}`}>
-    {user?.name}
-  </h2>
+                    <p className={`text-xs flex items-center gap-1.5 mt-1 ${mutedText}`}>
+                      <Mail size={12} className="flex-shrink-0" />
+                      <span className="truncate">{user?.email}</span>
+                    </p>
 
-  <p className={`text-xs flex items-center gap-1.5 mt-1 ${mutedText}`}>
-    <Mail size={12} className="flex-shrink-0" />
-    <span className="truncate">{user?.email}</span>
-  </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span
+                        className={`inline-flex items-center px-2 py-1 text-xs rounded-lg font-semibold ${
+                          user?.role === 'admin'
+                            ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
+                            : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                        }`}
+                      >
+                        {user?.role === 'admin' ? t('settings.admin') : t('settings.user')}
+                      </span>
 
-  <div className="flex items-center gap-2 mt-2">
-    <span
-      className={`inline-flex items-center px-2 py-1 text-xs rounded-lg font-semibold ${
-        user?.role === 'admin'
-          ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
-          : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-      }`}
-    >
-      {user?.role === 'admin' ? t('settings.admin') : t('settings.user')}
-    </span>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-semibold border transition-all ${
+                          dark
+                            ? 'bg-white/5 border-white/10 text-slate-200 hover:text-cyan-300 hover:border-cyan-400/30'
+                            : 'bg-white border-slate-200 text-slate-700 hover:text-cyan-600 hover:border-cyan-300'
+                        }`}
+                      >
+                        <Camera size={10} className="sm:w-3 sm:h-3" />
+                        Đổi ảnh
+                      </button>
+                    </div>
 
-    <button
-  type="button"
-  onClick={() => fileInputRef.current?.click()}
-  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-semibold border transition-all ${
-    dark
-      ? 'bg-white/5 border-white/10 text-slate-200 hover:text-cyan-300 hover:border-cyan-400/30'
-      : 'bg-white border-slate-200 text-slate-700 hover:text-cyan-600 hover:border-cyan-300'
-  }`}
->
-  <Camera size={10} className="sm:w-3 sm:h-3" />
-  Đổi ảnh
-</button>
+                    {avatarFile && (
+                      <p className="text-xs text-cyan-400 mt-2 truncate">
+                        Đã chọn: {avatarFile.name}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
 
-  </div>
+              <form onSubmit={handleProfile} className="p-4 space-y-4">
+                <div>
+                  <label className={`block text-xs font-semibold mb-1.5 ${mutedText}`}>
+                    {t('settings.fullName')}
+                  </label>
+                  <InputRow icon={User} dark={dark}>
+                    <input
+                      value={name}
+                      onChange={e => setName(e.target.value)}
+                      className={`flex-1 bg-transparent text-sm outline-none ${inputText}`}
+                      placeholder={t('settings.yourName')}
+                    />
+                  </InputRow>
+                </div>
 
-  {avatarFile && (
-    <p className="text-xs text-cyan-400 mt-2 truncate">
-      Đã chọn: {avatarFile.name}
-    </p>
-  )}
-</div>
+                <div>
+                  <label className={`block text-xs font-semibold mb-2 ${mutedText}`}>
+                    {t('settings.workingHours')}
+                  </label>
 
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <TimePicker
+                      value={workStart}
+                      onChange={setWorkStart}
+                      label={t('settings.start')}
+                      dark={dark}
+                    />
 
-        
-      </div>
-    </div>
+                    <TimePicker
+                      value={workEnd}
+                      onChange={setWorkEnd}
+                      label={t('settings.end')}
+                      dark={dark}
+                    />
+                  </div>
+                </div>
 
-    <form onSubmit={handleProfile} className="p-4 space-y-4">
-      <div>
-        <label className={`block text-xs font-semibold mb-1.5 ${mutedText}`}>
-          {t('settings.fullName')}
-        </label>
-        <InputRow icon={User} dark={dark}>
-          <input
-            value={name}
-            onChange={e => setName(e.target.value)}
-            className={`flex-1 bg-transparent text-sm outline-none ${inputText}`}
-            placeholder={t('settings.yourName')}
-          />
-        </InputRow>
-      </div>
+                <button
+                  type="submit"
+                  disabled={profileLoading}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-violet-500 text-white font-semibold rounded-xl text-xs hover:opacity-90 active:scale-95 transition-all disabled:opacity-60"
+                >
+                  {profileLoading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                  {profileLoading ? t('settings.saving') : t('settings.saveProfile')}
+                </button>
+              </form>
+            </motion.div>
+          )}
 
-     <div>
-  <label className={`block text-xs font-semibold mb-2 ${mutedText}`}>
-    {t('settings.workingHours')}
-  </label>
-
-  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-    <TimePicker
-      value={workStart}
-      onChange={setWorkStart}
-      label={t('settings.start')}
-      dark={dark}
-    />
-
-    <TimePicker
-      value={workEnd}
-      onChange={setWorkEnd}
-      label={t('settings.end')}
-      dark={dark}
-    />
-  </div>
-</div>
-      <button
-        type="submit"
-        disabled={profileLoading}
-        className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-violet-500 text-white font-semibold rounded-xl text-xs hover:opacity-90 active:scale-95 transition-all disabled:opacity-60"
-      >
-        {profileLoading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-        {profileLoading ? t('settings.saving') : t('settings.saveProfile')}
-      </button>
-    </form>
-  </motion.div>
-)}
-
-          {activeSection !== 'profile' && activeSection !== 'security' && (
+          {/* Info bar — chỉ hiện ở General */}
+          {activeSection === 'general' && (
             <div className={`${cardClass} relative z-10 p-3 flex items-center gap-3 border-l-2 border-cyan-500`}>
               <div className="w-7 h-7 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
                 <Globe size={13} className="text-cyan-400" />

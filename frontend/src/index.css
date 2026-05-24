@@ -47,8 +47,8 @@ body {
   min-height: 100vh;
   transition: background 0.4s ease, color 0.4s ease;
   background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(34,211,238,0.03), transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(139,92,246,0.04), transparent 50%);
+    radial-gradient(ellipse at 20% 50%, rgba(34,211,238,0.015), transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(139,92,246,0.02), transparent 50%);
 }
 
 /* =========================
@@ -152,16 +152,19 @@ input:-webkit-autofill:active {
 
 .glass {
   background: var(--bg-card);
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border);
   border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .glass-hover:hover {
   background: var(--bg-elevated);
   border-color: var(--primary);
   transform: translateY(-2px);
-  transition: all 0.2s ease;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* =========================
@@ -175,14 +178,14 @@ input:-webkit-autofill:active {
    BADGES
 ========================= */
 
-.badge-high { @apply bg-rose-500/20 text-rose-400 border border-rose-500/30; }
-.badge-medium { @apply bg-amber-500/20 text-amber-400 border border-amber-500/30; }
-.badge-low { @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
+.badge-high { background: rgba(244,63,94,0.25); color: #ff6b7a; border: 1px solid rgba(244,63,94,0.4); border-radius: 9999px; padding: 4px 10px; font-size: 12px; font-weight: 600; box-shadow: 0 0 12px rgba(244,63,94,0.15); }
+.badge-medium { background: rgba(245,158,11,0.25); color: #fcd34d; border: 1px solid rgba(245,158,11,0.4); border-radius: 9999px; padding: 4px 10px; font-size: 12px; font-weight: 600; box-shadow: 0 0 12px rgba(245,158,11,0.15); }
+.badge-low { background: rgba(16,185,129,0.25); color: #4ade80; border: 1px solid rgba(16,185,129,0.4); border-radius: 9999px; padding: 4px 10px; font-size: 12px; font-weight: 600; box-shadow: 0 0 12px rgba(16,185,129,0.15); }
 
-.badge-pending { @apply bg-slate-500/20 text-slate-400 border border-slate-500/30; }
-.badge-in-progress { @apply bg-blue-500/20 text-blue-400 border border-blue-500/30; }
-.badge-completed { @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
-.badge-cancelled { @apply bg-red-500/20 text-red-400 border border-red-500/30; }
+.badge-pending { background: rgba(100,116,139,0.2); color: #cbd5e1; border: 1px solid rgba(100,116,139,0.3); border-radius: 9999px; padding: 4px 10px; font-size: 12px; font-weight: 600; }
+.badge-in-progress { background: rgba(59,130,246,0.25); color: #7dd3fc; border: 1px solid rgba(59,130,246,0.4); border-radius: 9999px; padding: 4px 10px; font-size: 12px; font-weight: 600; box-shadow: 0 0 12px rgba(59,130,246,0.15); }
+.badge-completed { background: rgba(16,185,129,0.25); color: #4ade80; border: 1px solid rgba(16,185,129,0.4); border-radius: 9999px; padding: 4px 10px; font-size: 12px; font-weight: 600; box-shadow: 0 0 12px rgba(16,185,129,0.15); }
+.badge-cancelled { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.3); border-radius: 9999px; padding: 4px 10px; font-size: 12px; font-weight: 600; }
 
 /* =========================
    INPUT
@@ -300,32 +303,35 @@ select {
 
 .sidebar,
 .sidebar * {
-  color: #cbd5e1 !important;
+  color: #a1aec1 !important;
 }
 
 .sidebar a,
 .sidebar a *,
 .sidebar button,
 .sidebar button * {
-  color: #cbd5e1 !important;
+  color: #a1aec1 !important;
   opacity: 1 !important;
 }
 
-/* Brand */
+/* Brand - TaskFlow text */
 .sidebar p.font-bold,
 .sidebar p.font-bold * {
-  color: #f8fafc !important;
+  color: #ffffff !important;
+  font-weight: 700;
 }
 
 /* AI Powered */
 .sidebar [style*="--primary"] {
   color: var(--primary) !important;
+  font-weight: 600;
 }
 
-/* Active menu */
+/* Active menu - higher contrast */
 .sidebar a[aria-current='page'],
 .sidebar a[aria-current='page'] * {
   color: #ffffff !important;
+  font-weight: 600;
 }
 
 /* User name */
@@ -353,6 +359,7 @@ select {
 .sidebar .rounded-xl svg.text-white {
   color: #ffffff !important;
 }
+
 /* =========================
    DARK SURFACE TEXT FIX
    Fix chữ trong các khối nền tối khi đang light mode
@@ -431,7 +438,11 @@ select {
   background: var(--primary) !important;
   color: #ffffff !important;
 }
-/* Fix Chrome autofill white/blue fill on dark inputs */
+
+/* =========================
+   FIX CHROME AUTOFILL
+========================= */
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -466,7 +477,6 @@ select:autofill {
   color: #e2e8f0 !important;
 }
 
-
 /* =========================
    ANIMATION
 ========================= */
@@ -498,6 +508,15 @@ select:autofill {
   margin-left: 2px;
 }
 
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease both;
+}
+
 /* =========================
    MOBILE OPTIMIZATIONS
 ========================= */
@@ -511,8 +530,6 @@ select:autofill {
     overflow-x: hidden;
     -webkit-user-select: none;
     user-select: none;
-    -webkit-user-zoom: 1;
-    user-zoom: 1;
   }
 
   /* Prevent zoom on input focus on iOS */
@@ -539,37 +556,34 @@ select:autofill {
     padding: 12px;
   }
 
-  /* Reduce padding on small screens */
-  .p-4 { @apply p-3; }
-  .p-5 { @apply p-3; }
-  .p-6 { @apply p-4; }
-  .px-4 { @apply px-3; }
-  .px-6 { @apply px-4; }
-  .py-4 { @apply py-3; }
+  /* Reduce padding on small screens — CSS thuần thay @apply */
+  .p-4  { padding: 0.75rem; }
+  .p-5  { padding: 0.75rem; }
+  .p-6  { padding: 1rem; }
+  .px-4 { padding-left: 0.75rem; padding-right: 0.75rem; }
+  .px-6 { padding-left: 1rem;    padding-right: 1rem; }
+  .py-4 { padding-top: 0.75rem;  padding-bottom: 0.75rem; }
 
   /* Reduce gap on small screens */
-  .gap-4 { @apply gap-3; }
-  .gap-5 { @apply gap-4; }
-  .gap-6 { @apply gap-4; }
+  .gap-4 { gap: 0.75rem; }
+  .gap-5 { gap: 1rem; }
+  .gap-6 { gap: 1rem; }
 
   /* Space between sections */
-  .space-y-4 { @apply space-y-3; }
-  .space-y-5 { @apply space-y-4; }
-  .space-y-6 { @apply space-y-4; }
+  .space-y-4 > * + * { margin-top: 0.75rem; }
+  .space-y-5 > * + * { margin-top: 1rem; }
+  .space-y-6 > * + * { margin-top: 1rem; }
 
   /* Better scrolling */
-  -webkit-overflow-scrolling: touch;
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* Touch-friendly tap feedback */
 @media (hover: none) {
-  button:active {
-    opacity: 0.85;
-  }
-
-  a:active {
-    opacity: 0.85;
-  }
+  button:active { opacity: 0.85; }
+  a:active      { opacity: 0.85; }
 }
 
 /* Landscape mode optimizations */
@@ -582,10 +596,10 @@ select:autofill {
     padding: 8px !important;
   }
 
-  .space-y-4,
-  .space-y-5,
-  .space-y-6 {
-    gap: 8px !important;
+  .space-y-4 > * + *,
+  .space-y-5 > * + *,
+  .space-y-6 > * + * {
+    margin-top: 8px !important;
   }
 }
 
@@ -595,13 +609,14 @@ select:autofill {
     font-size: 13px;
   }
 
-  /* Stack layouts vertically */
+  /* Stack 2-col grids to 1 col — CSS thuần thay @apply grid-cols-1 */
   .grid-cols-2 {
-    @apply grid-cols-1;
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
   }
 
+  /* Stack flex rows — CSS thuần thay @apply flex-col */
   .flex-row {
-    @apply flex-col;
+    flex-direction: column !important;
   }
 
   /* Hide desktop-only content */

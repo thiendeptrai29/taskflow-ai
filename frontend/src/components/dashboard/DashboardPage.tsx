@@ -40,31 +40,48 @@ const PRIORITY_COLORS: Record<string, string> = {
 
 const StatCard = ({ icon: Icon, label, value, color, sub }: any) => (
   <motion.div
-    whileHover={{ y: -2 }}
-    className="glass glass-hover rounded-2xl p-3 md:p-4 border border-white/[0.05]"
+    whileHover={{ y: -4, scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+    className={`glass glass-hover rounded-2xl p-4 sm:p-5 md:p-5 lg:p-6 border border-white/[0.08] relative overflow-hidden group
+      before:absolute before:inset-0 before:rounded-2xl before:opacity-0 group-hover:before:opacity-100
+      before:transition-opacity before:duration-500 before:pointer-events-none
+      before:bg-gradient-to-br before:from-transparent before:to-white/[0.02]`}
   >
-    <div className="flex items-center gap-3">
-      <div
-        className={`w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center ${color} shadow-lg flex-shrink-0`}
-      >
-        <Icon size={16} className="text-white" />
+    {/* Glow effect background */}
+    <div className="absolute -inset-0.5 rounded-2xl opacity-0 group-hover:opacity-75 group-hover:animate-pulse bg-gradient-to-r from-white/0 via-white/5 to-white/0 blur-xl transition-opacity duration-500 -z-10" />
+    
+    {/* Thay đổi từ flex-col sang flex-row/flex-col linh hoạt để đẩy icon và số ngang hàng */}
+    <div className="flex flex-col justify-between h-full gap-3">
+      <div className="flex items-center justify-between gap-3">
+        {/* Nhóm Icon và Số liệu nằm ngang hàng với nhau */}
+        <div className="flex items-center gap-3 min-w-0">
+          <div
+            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center ${color} shadow-lg shadow-black/20 flex-shrink-0 relative`}
+          >
+            <Icon size={18} className="text-white" />
+          </div>
+          
+          <p className="text-2xl sm:text-3xl md:text-2xl lg:text-3xl font-extrabold text-white leading-none truncate">
+            {value}
+          </p>
+        </div>
+
+        {/* Nhãn phụ (ví dụ: % hoàn thành) nếu có sẽ nằm gọn bên phải */}
+        {sub && (
+          <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-slate-300 text-[10px] sm:text-xs font-semibold whitespace-nowrap flex-shrink-0 leading-tight">
+            {sub}
+          </span>
+        )}
       </div>
 
-      <div className="min-w-0">
-        <p className="text-xl md:text-2xl font-extrabold text-white leading-none">
-          {value}
-        </p>
-        <p className="text-slate-400 text-[11px] md:text-xs mt-1 truncate">
+      {/* Chữ mô tả (Label) được đưa xuống hàng dưới cùng của card */}
+      <div className="pt-1">
+        <p className="text-slate-300 text-xs sm:text-sm md:text-xs lg:text-sm font-medium truncate">
           {label}
         </p>
       </div>
     </div>
-
-    {sub && (
-      <p className="text-[10px] md:text-xs text-slate-600 mt-2 pl-12 md:pl-13 truncate">
-        {sub}
-      </p>
-    )}
   </motion.div>
 );
 
@@ -159,17 +176,18 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="space-y-4 animate-fade-in">
-        <div className="h-6 skeleton rounded-lg w-48" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
+      <div className="space-y-4 md:space-y-5 animate-fade-in">
+        <div className="h-8 md:h-9 skeleton rounded-lg w-48" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 md:gap-3 lg:gap-4">
           {[...Array(4)].map((_, index) => (
-            <div key={index} className="h-20 md:h-28 skeleton rounded-2xl" />
+            <div key={index} className="h-24 md:h-32 skeleton rounded-2xl" />
           ))}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
-          <div className="h-48 skeleton rounded-2xl" />
-          <div className="h-48 skeleton rounded-2xl" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
+          <div className="lg:col-span-2 h-56 md:h-64 skeleton rounded-2xl" />
+          <div className="h-56 md:h-64 skeleton rounded-2xl" />
         </div>
+        <div className="h-48 md:h-56 skeleton rounded-2xl" />
       </div>
     );
   }
@@ -177,44 +195,43 @@ export default function DashboardPage() {
   return (
     <div className="space-y-4 md:space-y-5 animate-fade-in">
       <div className="space-y-3">
-        <div className="flex items-start justify-between gap-3">
-  <div className="min-w-0">
-    <h1 className="text-lg md:text-xl font-extrabold text-white leading-tight">
-      {greeting()},{' '}
-      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">
-        {user?.name?.split(' ').pop()} 👋
-      </span>
-    </h1>
-    <p className="text-slate-400 text-[11px] md:text-xs mt-1 capitalize truncate">
-      {format(new Date(), 'EEEE, d MMMM yyyy', { locale: dateLocale })}
-    </p>
-  </div>
+        <div className="flex items-start justify-between gap-2 sm:gap-3">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl sm:text-2xl md:text-2xl lg:text-3xl font-extrabold text-white leading-tight">
+              {greeting()},{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400 animate-pulse">
+                {user?.name?.split(' ').pop()} 👋
+              </span>
+            </h1>
+            <p className="text-slate-300 text-xs sm:text-sm md:text-xs lg:text-sm mt-1.5 font-medium capitalize truncate">
+              {format(new Date(), 'EEEE, d MMMM yyyy', { locale: dateLocale })}
+            </p>
+          </div>
 
-  <div className="flex items-center gap-2 flex-shrink-0">
-    <Link
-      to="/tasks"
-      className="h-10 inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-500 px-3 text-white text-[11px] md:text-sm font-extrabold shadow-lg shadow-cyan-500/10 hover:opacity-90 active:scale-[0.98] transition-all whitespace-nowrap"
-    >
-      <Plus size={14} className="flex-shrink-0" />
-      <span className="hidden min-[390px]:inline">{t('dashboard.createTask')}</span>
-      <span className="min-[390px]:hidden">Tạo</span>
-    </Link>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Link
+              to="/tasks"
+              className="h-10 sm:h-11 inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-500 px-3 sm:px-4 text-white text-xs sm:text-sm font-extrabold shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 hover:scale-105 active:scale-95 transition-all whitespace-nowrap group"
+            >
+              <Plus size={16} className="flex-shrink-0 group-hover:rotate-90 transition-transform duration-300" />
+              <span className="hidden min-[420px]:inline">{t('dashboard.createTask')}</span>
+              <span className="min-[420px]:hidden">+</span>
+            </Link>
 
-    <button
-      type="button"
-      onClick={() => load(true)}
-      disabled={refreshing}
-      className="h-10 w-10 rounded-xl border border-white/10 bg-white/[0.04] text-slate-400 hover:text-white hover:bg-white/[0.08] active:scale-95 transition-all flex items-center justify-center flex-shrink-0"
-      title={t('dashboard.refresh')}
-    >
-      <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
-    </button>
-  </div>
-</div>
-
+            <button
+              type="button"
+              onClick={() => load(true)}
+              disabled={refreshing}
+              className="h-10 sm:h-11 w-10 sm:w-11 rounded-xl border border-white/15 bg-white/[0.06] hover:bg-white/[0.12] text-slate-300 hover:text-white active:scale-95 transition-all flex items-center justify-center flex-shrink-0 group"
+              title={t('dashboard.refresh')}
+            >
+              <RefreshCw size={18} className={`flex-shrink-0 group-hover:rotate-180 transition-all duration-500 ${refreshing ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 md:gap-3 lg:gap-4">
         <StatCard
           icon={Target}
           label={t('dashboard.totalTasks')}
@@ -226,7 +243,7 @@ export default function DashboardPage() {
           label={t('dashboard.completed')}
           value={stats?.completed ?? 0}
           color="bg-gradient-to-br from-emerald-500 to-emerald-600"
-          sub={`${t('dashboard.rate')} ${stats?.completionRate ?? 0}%`}
+          sub={`${stats?.completionRate ?? 0}%`}
         />
         <StatCard
           icon={Clock}
@@ -243,51 +260,51 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
-        <div className="lg:col-span-2 glass rounded-2xl p-4 border border-white/[0.05]">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-white text-xs flex items-center gap-2">
-              <TrendingUp size={14} className="text-cyan-400" />
-              {t('dashboard.last7Days')}
+        <div className="lg:col-span-2 glass rounded-2xl p-5 md:p-6 border border-white/[0.08]">
+          <div className="flex items-center justify-between mb-5 md:mb-6 gap-2">
+            <h3 className="font-bold text-white text-sm sm:text-base flex items-center gap-2.5 flex-shrink-0">
+              <TrendingUp size={16} className="text-cyan-400 flex-shrink-0" />
+              <span>{t('dashboard.last7Days')}</span>
             </h3>
           </div>
 
-          <ResponsiveContainer width="100%" height={170}>
+          <ResponsiveContainer width="100%" height={window.innerWidth < 768 ? 180 : 220}>
             <AreaChart data={stats?.dailyStats ?? []}>
               <defs>
                 <linearGradient id="colorCreated" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.2} />
+                  <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.25} />
                   <stop offset="95%" stopColor="#22d3ee" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="colorCompleted" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
                   <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                 </linearGradient>
               </defs>
 
               <XAxis
                 dataKey="date"
-                tick={{ fill: dark ? '#64748b' : '#64748b', fontSize: 9 }}
+                tick={{ fill: dark ? '#94a3b8' : '#64748b', fontSize: window.innerWidth < 640 ? 11 : 12 }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fill: dark ? '#64748b' : '#64748b', fontSize: 9 }}
+                tick={{ fill: dark ? '#94a3b8' : '#64748b', fontSize: window.innerWidth < 640 ? 11 : 12 }}
                 axisLine={false}
                 tickLine={false}
-                width={22}
+                width={window.innerWidth < 640 ? 28 : 32}
               />
               <Tooltip
                 contentStyle={tooltipStyle}
                 itemStyle={tooltipTextStyle}
                 labelStyle={tooltipTextStyle}
-                cursor={{ stroke: dark ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.08)' }}
+                cursor={{ stroke: dark ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.1)' }}
               />
               <Area
                 type="monotone"
                 dataKey="created"
                 name={t('dashboard.created')}
                 stroke="#22d3ee"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 fill="url(#colorCreated)"
               />
               <Area
@@ -295,17 +312,17 @@ export default function DashboardPage() {
                 dataKey="completed"
                 name={t('dashboard.completedChart')}
                 stroke="#10b981"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 fill="url(#colorCompleted)"
               />
             </AreaChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="glass rounded-2xl p-4 border border-white/[0.05]">
-          <h3 className="font-bold text-white text-xs mb-4 flex items-center gap-2">
-            <Zap size={14} className="text-amber-400" />
-            {t('dashboard.byPriority')}
+        <div className="glass rounded-2xl p-5 md:p-6 border border-white/[0.08]">
+          <h3 className="font-bold text-white text-sm sm:text-base mb-5 md:mb-6 flex items-center gap-2.5">
+            <Zap size={16} className="text-amber-400 flex-shrink-0" />
+            <span>{t('dashboard.byPriority')}</span>
           </h3>
 
           {priorityChartData.length > 0 ? (
@@ -334,17 +351,17 @@ export default function DashboardPage() {
                 </PieChart>
               </ResponsiveContainer>
 
-              <div className="space-y-1.5 mt-2">
+              <div className="space-y-2 mt-4">
                 {priorityChartData.map(item => (
-                  <div key={item.key} className="flex items-center justify-between gap-3 text-xs">
-                    <div className="flex items-center gap-2 min-w-0">
+                  <div key={item.key} className="flex items-center justify-between gap-3 text-sm">
+                    <div className="flex items-center gap-2.5 min-w-0">
                       <span
-                        className="w-2 h-2 rounded-full flex-shrink-0"
-                        style={{ background: PRIORITY_COLORS[item.key] }}
+                        className="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-lg"
+                        style={{ background: PRIORITY_COLORS[item.key], boxShadow: `0 0 8px ${PRIORITY_COLORS[item.key]}40` }}
                       />
-                      <span className="text-slate-400 truncate">{item.name}</span>
+                      <span className="text-slate-300 font-medium truncate">{item.name}</span>
                     </div>
-                    <span className="font-semibold text-slate-200 flex-shrink-0">
+                    <span className="font-semibold text-white flex-shrink-0 bg-white/10 px-2.5 py-1 rounded-lg text-xs">
                       {item.count}
                     </span>
                   </div>
@@ -359,54 +376,56 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="glass rounded-2xl p-4 border border-white/[0.05]">
-        <div className="flex items-center justify-between mb-4 gap-2">
-          <h3 className="font-bold text-white text-xs flex items-center gap-2 flex-shrink-0">
-            <Clock size={14} className="text-violet-400 flex-shrink-0" />
+      <div className="glass rounded-2xl p-5 md:p-6 border border-white/[0.08]">
+        <div className="flex items-center justify-between mb-5 md:mb-6 gap-2">
+          <h3 className="font-bold text-white text-sm sm:text-base flex items-center gap-2.5 flex-shrink-0">
+            <Clock size={16} className="text-violet-400 flex-shrink-0" />
             <span>{t('dashboard.upcoming')}</span>
           </h3>
 
           <Link
             to="/tasks"
-            className="text-cyan-400 text-xs hover:text-cyan-300 flex items-center gap-1 transition-colors flex-shrink-0"
+            className="text-cyan-400 hover:text-cyan-300 text-xs sm:text-sm font-medium flex items-center gap-1.5 transition-colors flex-shrink-0 group"
           >
-            {t('dashboard.viewAll')} <ArrowRight size={12} />
+            {t('dashboard.viewAll')} 
+            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
         {upcomingTasks.length === 0 ? (
-          <div className="text-center py-6 text-slate-500">
-            <CheckCircle2 size={28} className="mx-auto mb-2 opacity-30" />
-            <p className="text-xs">{t('dashboard.noUpcoming')}</p>
+          <div className="text-center py-8 md:py-10 text-slate-500">
+            <CheckCircle2 size={32} className="mx-auto mb-3 opacity-25" />
+            <p className="text-sm">{t('dashboard.noUpcoming')}</p>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {upcomingTasks.map(task => (
               <motion.div
                 key={task._id}
-                whileHover={{ x: 2 }}
-                className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-all"
+                whileHover={{ x: 4, backgroundColor: 'rgba(255,255,255,0.08)' }}
+                whileTap={{ scale: 0.98 }}
+                className="flex items-start gap-3 p-3.5 md:p-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/5 hover:border-white/10 transition-all cursor-pointer group"
               >
                 <div
-                  className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                  className={`w-3 h-3 rounded-full flex-shrink-0 mt-1 ${
                     task.priority === 'high'
-                      ? 'bg-rose-400'
+                      ? 'bg-rose-400 shadow-lg shadow-rose-400/30'
                       : task.priority === 'medium'
-                        ? 'bg-amber-400'
-                        : 'bg-emerald-400'
+                        ? 'bg-amber-400 shadow-lg shadow-amber-400/30'
+                        : 'bg-emerald-400 shadow-lg shadow-emerald-400/30'
                   }`}
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-slate-200 text-xs font-medium truncate">{task.title}</p>
+                  <p className="text-slate-200 text-sm font-semibold truncate group-hover:text-white transition-colors">{task.title}</p>
                   {task.deadline && (
-                    <p className="text-slate-500 text-xs mt-0.5">
+                    <p className="text-slate-400 text-xs mt-1">
                       {format(new Date(task.deadline), 'd MMM yyyy, HH:mm', { locale: dateLocale })}
                     </p>
                   )}
                 </div>
 
                 <span
-                  className={`px-2 py-0.5 text-xs rounded-full font-medium badge-${task.priority} flex-shrink-0 whitespace-nowrap`}
+                  className={`px-2.5 py-1 text-xs rounded-full font-semibold badge-${task.priority} flex-shrink-0 whitespace-nowrap`}
                 >
                   {priorityShortLabel[task.priority]}
                 </span>
@@ -418,22 +437,26 @@ export default function DashboardPage() {
 
       <Link to="/ai">
         <motion.div
-          whileHover={{ scale: 1.01 }}
-          className="relative overflow-hidden rounded-2xl p-4 bg-gradient-to-r from-cyan-500/10 via-violet-500/10 to-rose-500/10 border border-white/10 cursor-pointer group"
+          whileHover={{ scale: 1.02, y: -4 }}
+          whileTap={{ scale: 0.98 }}
+          className="relative overflow-hidden rounded-2xl p-5 md:p-6 bg-gradient-to-r from-cyan-500/15 via-violet-500/15 to-rose-500/15 border border-cyan-400/20 hover:border-cyan-400/40 cursor-pointer group transition-all backdrop-blur-sm"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center shadow-xl animate-float flex-shrink-0">
-              <Sparkles size={20} className="text-white" />
+          {/* Animated gradient overlay on hover */}
+          <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-50 bg-gradient-to-r from-cyan-500/5 via-violet-500/5 to-rose-500/5 transition-opacity duration-500 blur-xl -z-10" />
+          
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center shadow-xl shadow-cyan-500/30 flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+              <Sparkles size={24} className="text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-bold text-white">AI Assistant</h3>
-              <p className="text-slate-400 text-xs truncate">
+              <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-cyan-200 transition-colors">AI Assistant</h3>
+              <p className="text-slate-400 group-hover:text-slate-300 text-xs sm:text-sm truncate transition-colors">
                 {t('dashboard.aiDescription')}
               </p>
             </div>
             <ArrowRight
-              size={16}
-              className="text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all flex-shrink-0"
+              size={20}
+              className="text-slate-400 group-hover:text-cyan-300 group-hover:translate-x-2 transition-all flex-shrink-0"
             />
           </div>
         </motion.div>
