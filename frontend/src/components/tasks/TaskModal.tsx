@@ -730,13 +730,13 @@ export default function TaskModal({ task, onClose }: Props) {
       onClick={e => e.target === e.currentTarget && onClose()}
     >
       {/* Inner wrapper căn giữa đúng kể cả khi overflow */}
-      <div className="flex min-h-full items-end md:items-center justify-center md:p-4 pointer-events-none">
+      <div className="flex min-h-full items-end md:items-start justify-center md:p-4 md:pt-6 pointer-events-none">
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 20 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="w-full md:max-w-lg glass rounded-t-2xl md:rounded-2xl flex flex-col max-h-[92vh] md:max-h-[85vh] pointer-events-auto"
+        className="w-full md:max-w-lg glass rounded-t-2xl md:rounded-2xl flex flex-col max-h-[92vh] md:max-h-[90vh] pointer-events-auto"
       >
         <div className="flex justify-center pt-2.5 pb-1 md:hidden flex-shrink-0">
           <div className="w-10 h-1 rounded-full bg-white/20" />
