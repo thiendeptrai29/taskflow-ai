@@ -134,11 +134,24 @@ export default function DashboardPage() {
     try {
       const [statsRes, tasksRes] = await Promise.all([
         statsAPI.getUserStats(),
-        taskAPI.getAll({ status: 'pending', sort: 'deadline' } as any),
+        taskAPI.getAll({ sort: 'deadline' } as any),
       ]);
 
       setStats(statsRes.data.stats);
-      setUpcomingTasks(tasksRes.data.tasks.filter((task: Task) => task.deadline).slice(0, 5));
+      const now = new Date();
+const in3Days = new Date();
+in3Days.setDate(in3Days.getDate() + 3);
+
+setUpcomingTasks(
+  tasksRes.data.tasks
+    .filter((task: Task) =>
+      task.deadline &&
+      task.status !== 'completed' &&
+      new Date(task.deadline) >= now &&
+      new Date(task.deadline) <= in3Days
+    )
+    .slice(0, 5)
+);
     } finally {
       setLoading(false);
       setRefreshing(false);
