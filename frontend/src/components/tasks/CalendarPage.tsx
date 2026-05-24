@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { taskAPI } from '../../services/api';
 import { Task } from '../../types';
 import {
@@ -23,6 +24,7 @@ const PRIORITY_DOT: Record<string, string> = {
 
 export default function CalendarPage() {
   const { language, t } = useLanguage();
+  const navigate = useNavigate();
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -81,6 +83,11 @@ export default function CalendarPage() {
 
   const nextMonth = () => {
     setCurrentDate(date => new Date(date.getFullYear(), date.getMonth() + 1, 1));
+  };
+
+  // Điều hướng sang trang Tasks và highlight task được chọn
+  const handleTaskClick = (task: Task) => {
+    navigate(`/tasks?highlight=${task._id}`);
   };
 
   return (
@@ -203,15 +210,21 @@ export default function CalendarPage() {
           ) : (
             <div className="space-y-2">
               {selectedTasks.map(task => (
-                <div key={task._id} className="p-3 rounded-xl bg-white/3 border border-white/5">
+                <motion.div
+                  key={task._id}
+                  whileHover={{ scale: 1.02, x: 4 }}
+                  onClick={() => handleTaskClick(task)}
+                  className="p-3 rounded-xl bg-white/3 border border-white/5 cursor-pointer hover:bg-white/8 hover:border-cyan-500/30 transition-all group"
+                  title="Nhấn để xem công việc"
+                >
                   <div className="flex items-start gap-2">
                     <span
                       className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${PRIORITY_DOT[task.priority]}`}
                     />
 
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <p
-                        className={`text-xs font-semibold ${
+                        className={`text-xs font-semibold group-hover:text-cyan-300 transition-colors ${
                           task.status === 'completed'
                             ? 'line-through text-slate-500'
                             : 'text-slate-200'
@@ -226,12 +239,19 @@ export default function CalendarPage() {
                         </p>
                       )}
 
-                      <span className={`inline-block mt-1 px-1.5 py-0.5 text-xs rounded-full badge-${task.status}`}>
-                        {statusLabels[task.status] || task.status}
-                      </span>
+                      <div className="flex items-center justify-between mt-1">
+                        <span className={`inline-block px-1.5 py-0.5 text-xs rounded-full badge-${task.status}`}>
+                          {statusLabels[task.status] || task.status}
+                        </span>
+
+                        {/* Mũi tên gợi ý có thể nhấn */}
+                        <span className="text-slate-600 text-xs group-hover:text-cyan-400 transition-colors opacity-0 group-hover:opacity-100">
+                          → xem
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           )}
