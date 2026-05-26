@@ -30,6 +30,7 @@ import {
   ListTodo,
   AlignLeft,
   CalendarDays,
+  Sparkles,
   X,
 } from 'lucide-react';
 import { useTeamStore, TeamMember } from '../../store/teamStore';
@@ -694,11 +695,14 @@ function DeadlinePicker({
 function TeamTaskModal({
   members,
   loading,
+  aiLoading,
   onClose,
   onSubmit,
+  onAICreate,
 }: {
   members: TeamMember[];
   loading: boolean;
+  aiLoading: boolean;
   onClose: () => void;
   onSubmit: (payload: {
     title: string;
@@ -708,6 +712,7 @@ function TeamTaskModal({
     deadline?: string;
     assignee?: string | null;
   }) => void;
+  onAICreate: (payload: { text: string; assignee?: string | null }) => void;
 }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -715,6 +720,8 @@ function TeamTaskModal({
   const [status, setStatus] = useState<TaskStatus>('pending');
   const [assignee, setAssignee] = useState('');
   const [deadline, setDeadline] = useState<Date | null>(null);
+  const [showAI, setShowAI] = useState(false);
+  const [aiText, setAiText] = useState('');
 
   const assigneeOptions: DropdownOption[] = [
     { value: '', label: 'Chưa giao' },
@@ -733,6 +740,18 @@ function TeamTaskModal({
       priority,
       status,
       deadline: deadline?.toISOString(),
+      assignee: assignee || null,
+    });
+  };
+
+  const createWithAI = () => {
+    if (!aiText.trim()) {
+      toast.error('Nhập mô tả task cho AI');
+      return;
+    }
+
+    onAICreate({
+      text: aiText.trim(),
       assignee: assignee || null,
     });
   };
@@ -757,9 +776,18 @@ function TeamTaskModal({
         </div>
 
         <div className="flex items-center justify-between gap-2 px-4 md:px-6 py-3 md:py-4 border-b border-white/5 flex-shrink-0">
-          <div className="flex items-center gap-2 min-w-0">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
             <ListTodo size={16} className="md:size-5 text-cyan-400 flex-shrink-0" />
             <h2 className="font-bold text-white text-sm md:text-base truncate">Tạo task team</h2>
+
+            <button
+              type="button"
+              onClick={() => setShowAI(current => !current)}
+              className="h-8 inline-flex items-center justify-center gap-1.5 px-2.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-[11px] md:text-xs font-semibold hover:bg-cyan-500/20 transition-all whitespace-nowrap flex-shrink-0"
+            >
+              <Sparkles size={12} />
+              <span>AI tạo task</span>
+            </button>
           </div>
 
           <button
@@ -770,6 +798,40 @@ function TeamTaskModal({
             <X size={18} />
           </button>
         </div>
+
+        <AnimatePresence>
+          {showAI && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden flex-shrink-0"
+            >
+              <div className="px-4 md:px-6 py-3 md:py-4 bg-cyan-500/5 border-b border-cyan-500/10">
+                <p className="text-xs text-cyan-400 font-medium mb-1">
+                  Mô tả task team bằng ngôn ngữ tự nhiên:
+                </p>
+                <textarea
+                  value={aiText}
+                  onChange={event => setAiText(event.target.value)}
+                  onKeyDown={event => event.key === 'Enter' && event.ctrlKey && createWithAI()}
+                  className="input-dark text-xs resize-none w-full"
+                  rows={3}
+                  placeholder="VD: Tạo task review UI dashboard trước thứ sáu, ưu tiên cao..."
+                />
+                <button
+                  type="button"
+                  onClick={createWithAI}
+                  disabled={aiLoading || !aiText.trim()}
+                  className="btn-primary mt-2 text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 w-full"
+                >
+                  {aiLoading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                  {aiLoading ? 'Đang tạo task...' : 'Tạo task team với AI'}
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <form onSubmit={submit} className="p-4 md:p-6 space-y-3 md:space-y-4 overflow-y-auto flex-1">
           <div>
@@ -886,6 +948,7 @@ export default function TeamDetailPage() {
   const [tasksLoading, setTasksLoading] = useState(false);
   const [activityLoading, setActivityLoading] = useState(false);
   const [creatingTask, setCreatingTask] = useState(false);
+  const [creatingTaskWithAI, setCreatingTaskWithAI] = useState(false);
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -1051,6 +1114,34 @@ export default function TeamDetailPage() {
       toast.error(err.response?.data?.message || 'Không thể tạo task');
     } finally {
       setCreatingTask(false);
+    }
+  };
+
+  const handleCreateTeamTaskWithAI = async (payload: { text: string; assignee?: string | null }) => {
+    if (!canManage) {
+      toast.error('Chỉ Owner hoặc Admin mới được thêm task');
+      return;
+    }
+
+    if (!payload.text.trim()) {
+      toast.error('Nhập mô tả task cho AI');
+      return;
+    }
+
+    setCreatingTaskWithAI(true);
+
+    try {
+      const res = await teamAPI.createTaskWithAI(id!, payload);
+      const taskTitle = res.data.task?.title || 'task';
+
+      toast.success(`AI đã tạo "${taskTitle}"`);
+      setShowTeamTaskModal(false);
+      fetchTeamTasks();
+      fetchTeamDetail(id!).catch(() => {});
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Không thể tạo task bằng AI');
+    } finally {
+      setCreatingTaskWithAI(false);
     }
   };
 
@@ -1817,8 +1908,10 @@ export default function TeamDetailPage() {
           <TeamTaskModal
             members={currentTeam.members || []}
             loading={creatingTask}
+            aiLoading={creatingTaskWithAI}
             onClose={() => setShowTeamTaskModal(false)}
             onSubmit={handleCreateTeamTask}
+            onAICreate={handleCreateTeamTaskWithAI}
           />
         )}
       </AnimatePresence>

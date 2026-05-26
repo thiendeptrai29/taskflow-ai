@@ -2,6 +2,10 @@ const Team = require('../models/Team');
 const Task = require('../models/Task');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
+const Groq = require('groq-sdk');
+
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const AI_MODEL = 'llama-3.1-8b-instant';
 
 const getMyRole = (team, userId) => {
   const uid = userId.toString();
@@ -13,6 +17,50 @@ const getMyRole = (team, userId) => {
 };
 
 const canManageTasks = role => ['owner', 'admin'].includes(role);
+
+const callGroqText = async (systemPrompt, userMessage) => {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey || apiKey === 'gsk_your_key_here') {
+    throw new Error('GROQ_API_KEY chua duoc cau hinh trong .env');
+  }
+
+  const completion = await groq.chat.completions.create({
+    model: AI_MODEL,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userMessage }
+    ],
+    max_tokens: 1024,
+    temperature: 0.4
+  });
+
+  return completion.choices[0].message.content;
+};
+
+const callGroqJSON = async (systemPrompt, userMessage) => {
+  const text = await callGroqText(systemPrompt, userMessage);
+  const clean = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+  try {
+    return JSON.parse(clean);
+  } catch {
+    const match = clean.match(/\{[\s\S]*\}/);
+    if (match) return JSON.parse(match[0]);
+    throw new Error('AI tra ve dinh dang khong hop le, thu lai');
+  }
+};
+
+const getAIErrorMessage = error => {
+  const msg = error.message || '';
+  if (msg.includes('GROQ_API_KEY')) return msg;
+  if (msg.includes('401') || msg.includes('invalid_api_key') || msg.includes('Authentication')) {
+    return 'Groq API key khong hop le. Kiem tra GROQ_API_KEY trong .env';
+  }
+  if (msg.includes('429') || msg.includes('rate_limit')) {
+    return 'Gui qua nhanh. Cho vai giay roi thu lai';
+  }
+  return `Loi AI: ${msg}`;
+};
 
 const addActivity = (team, type, message, actor) => {
   if (!team.activities) team.activities = [];
@@ -580,6 +628,91 @@ exports.createTeamTask = async (req, res) => {
   } catch (error) {
     console.error('createTeamTask error:', error);
     res.status(500).json({ success: false, message: 'Lỗi tạo task' });
+  }
+};
+
+exports.createTeamTaskWithAI = async (req, res) => {
+  try {
+    const team = await Team.findById(req.params.id);
+
+    if (!team) return res.status(404).json({ success: false, message: 'Team khong ton tai' });
+
+    const myRole = getMyRole(team, req.user._id);
+    if (!canManageTasks(myRole)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Chi Owner hoac Admin moi duoc them task va giao nhiem vu'
+      });
+    }
+
+    const { text, assignee } = req.body;
+
+    if (!text || !text.trim()) {
+      return res.status(400).json({ success: false, message: 'Thieu mo ta task' });
+    }
+
+    if (assignee && !isTeamMember(team, assignee)) {
+      return res.status(400).json({ success: false, message: 'Nguoi duoc giao khong thuoc team nay' });
+    }
+
+    const taskData = await callGroqJSON(
+      `Extract a team task from Vietnamese or English natural language.
+Return only JSON, no markdown.
+Current date: ${new Date().toISOString()}.
+Format: { "title": string, "description": string, "priority": "low"|"medium"|"high", "status": "pending"|"in-progress"|"completed"|"cancelled", "deadline": string|null, "category": string, "estimatedDuration": number, "tags": string[] }
+Use ISO 8601 for deadline when a date or time is mentioned. Default status is "pending".`,
+      `Create a team task from: "${text}"`
+    );
+
+    const title = String(taskData.title || '').trim();
+    if (!title) {
+      return res.status(400).json({ success: false, message: 'AI chua tao duoc tieu de task' });
+    }
+
+    const task = await Task.create({
+      title,
+      description: taskData.description || '',
+      priority: ['low', 'medium', 'high'].includes(taskData.priority) ? taskData.priority : 'medium',
+      status: ['pending', 'in-progress', 'completed', 'cancelled'].includes(taskData.status) ? taskData.status : 'pending',
+      deadline: taskData.deadline || undefined,
+      category: taskData.category || 'general',
+      estimatedDuration: Number(taskData.estimatedDuration) || 30,
+      tags: Array.isArray(taskData.tags) ? taskData.tags : [],
+      aiSuggested: true,
+      user: req.user._id,
+      team: req.params.id,
+      assignee: assignee || null
+    });
+
+    await task.populate('user', 'name email avatar');
+    await task.populate('assignee', 'name email avatar');
+
+    addActivity(team, 'task_created', `${req.user.name} da tao task bang AI "${task.title}"`, req.user._id);
+    await team.save();
+
+    if (assignee && assignee.toString() !== req.user._id.toString()) {
+      try {
+        await Notification.create({
+          user: assignee,
+          title: 'Ban duoc giao task moi',
+          message: `${req.user.name} da giao cho ban task "${task.title}" trong team "${team.name}".`,
+          type: 'system',
+          metadata: {
+            taskId: task._id,
+            teamId: team._id,
+            teamName: team.name,
+            assignedBy: req.user.name
+          }
+        });
+      } catch (notificationError) {
+        console.error('createTeamTaskWithAI notification error:', notificationError);
+      }
+    }
+
+    res.status(201).json({ success: true, message: 'Task created by AI', task });
+  } catch (error) {
+    console.error('createTeamTaskWithAI error:', error.message);
+    res.status(500).json({ success: false, message: getAIErrorMessage(error) });
   }
 };
 

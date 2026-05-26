@@ -102,6 +102,8 @@ export const teamAPI = {
     api.get(`/teams/${id}/tasks`, { params }),
   createTask: (id: string, data: Record<string, unknown>) =>
     api.post(`/teams/${id}/tasks`, data),
+  createTaskWithAI: (id: string, data: { text: string; assignee?: string | null }) =>
+    api.post(`/teams/${id}/tasks/ai`, data),
   updateTask: (teamId: string, taskId: string, data: Record<string, unknown>) =>
     api.patch(`/teams/${teamId}/tasks/${taskId}`, data),
   deleteTask: (teamId: string, taskId: string) =>

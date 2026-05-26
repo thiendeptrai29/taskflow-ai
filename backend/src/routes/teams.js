@@ -17,6 +17,7 @@ const {
   removeMember,
   getTeamTasks,
   createTeamTask,
+  createTeamTaskWithAI,
   updateTeamTask,
   deleteTeamTask,
   getTeamActivities
@@ -39,6 +40,7 @@ router.delete('/:id/members/:memberId', removeMember);
 
 router.get('/:id/tasks', getTeamTasks);
 router.post('/:id/tasks', createTeamTask);
+router.post('/:id/tasks/ai', createTeamTaskWithAI);
 router.patch('/:id/tasks/:taskId', updateTeamTask);
 router.delete('/:id/tasks/:taskId', deleteTeamTask);
 router.get('/:id/activities', getTeamActivities);
